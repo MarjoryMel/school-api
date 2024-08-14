@@ -4,13 +4,13 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 exports.registerUser = async (req, res) => {
-    const { username, email, password, isAdmin } = req.body;
-    
+    const { username, email, password } = req.body; 
+
     try {
-        console.log('Registering user:', { username, email, isAdmin });
+        console.log('Registering user:', { username, email });
 
         // Cria um novo usuário
-        const newUser = new User({ username, email, password, isAdmin });
+        const newUser = new User({ username, email, password }); 
         await newUser.save();
         console.log('User registered successfully:', newUser);
 
