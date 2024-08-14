@@ -1,15 +1,16 @@
 const User = require('../models/userModel');
-const authMiddleware = require('../utils/middlewares')
+const authMiddleware = require('../utils/middlewares');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+// Register a new user
 exports.registerUser = async (req, res) => {
     const { username, email, password } = req.body; 
 
     try {
         console.log('Registering user:', { username, email });
 
-        // Cria um novo usuário
+        // Create a new user
         const newUser = new User({ username, email, password }); 
         await newUser.save();
         console.log('User registered successfully:', newUser);
@@ -21,22 +22,21 @@ exports.registerUser = async (req, res) => {
     }
 };
 
-
-// Logar usuário
+// Log in user
 exports.loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     try {
         console.log('Logging in user with email:', email);
 
-        // Verifica se o usuário existe
+        // Check if the user exists
         const user = await User.findOne({ email });
         if (!user) {
             console.log('User not found');
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        // Verifica a senha
+        // Check the password
         const isMatch = await bcrypt.compare(password, user.password);
         console.log('Password match result:', isMatch);
 
@@ -45,7 +45,7 @@ exports.loginUser = async (req, res) => {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        // Gera o token JWT
+        // Generate JWT token
         const token = jwt.sign(
             { userId: user._id, isAdmin: user.isAdmin },
             process.env.JWT_SECRET,
@@ -69,13 +69,12 @@ exports.loginUser = async (req, res) => {
     }
 };
 
-
-// Criar novo admin
+// Create a new admin user
 exports.createAdmin = async (req, res) => {
     const { username, email, password } = req.body;
 
     try {
-        // Verifica se o usuário autenticado é administrador
+        // Check if the authenticated user is an admin
         if (!req.user.isAdmin) {
             console.log('Access denied. User is not an admin.');
             return res.status(403).json({ message: 'Access denied. Admins only.' });
@@ -83,14 +82,14 @@ exports.createAdmin = async (req, res) => {
 
         console.log('Creating admin user:', { username, email });
 
-        // Verifica se o usuário já existe
+        // Check if the user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             console.log('User with this email already exists.');
             return res.status(400).json({ message: 'User with this email already exists.' });
         }
 
-        // Cria e salva um novo administrador
+        // Create and save a new admin user
         const newAdmin = new User({
             username,
             email,
