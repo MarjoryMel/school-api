@@ -5,22 +5,31 @@ const jwt = require('jsonwebtoken');
 
 // Register a new user
 exports.registerUser = async (req, res) => {
-    const { username, email, password } = req.body; 
+    const { username, email, password } = req.body;
 
     try {
         console.log('Registering user:', { username, email });
 
         // Create a new user
-        const newUser = new User({ username, email, password }); 
+        const newUser = new User({ username, email, password });
         await newUser.save();
         console.log('User registered successfully:', newUser);
 
-        res.status(201).json({ message: 'User registered successfully', user: newUser });
+        res.status(201).json({
+            message: 'User registered successfully',
+            user: {
+                id: newUser._id,  // Include the user's ID in the response
+                username: newUser.username,
+                email: newUser.email,
+                isAdmin: newUser.isAdmin
+            }
+        });
     } catch (error) {
         console.error('Error registering user:', error.message);
         res.status(500).json({ error: error.message });
     }
 };
+
 
 // Log in user
 exports.loginUser = async (req, res) => {
@@ -69,7 +78,6 @@ exports.loginUser = async (req, res) => {
     }
 };
 
-// Create a new admin user
 exports.createAdmin = async (req, res) => {
     const { username, email, password } = req.body;
 
@@ -93,7 +101,7 @@ exports.createAdmin = async (req, res) => {
         const newAdmin = new User({
             username,
             email,
-            password, 
+            password,
             isAdmin: true
         });
 
@@ -103,7 +111,7 @@ exports.createAdmin = async (req, res) => {
         res.status(201).json({
             message: 'Admin created successfully',
             user: {
-                id: newAdmin._id,
+                id: newAdmin._id,  // Include the admin's ID in the response
                 username: newAdmin.username,
                 email: newAdmin.email,
                 isAdmin: newAdmin.isAdmin
@@ -114,3 +122,4 @@ exports.createAdmin = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
