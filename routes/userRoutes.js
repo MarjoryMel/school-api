@@ -3,8 +3,10 @@ const router = express.Router();
 const UserController = require('../controls/userController');
 const authMiddleware = require('../utils/middlewares');
 
-router.post('/register', UserController.registerUser);              // Route to register a new user
-router.post('/login', UserController.loginUser);                    // Route to log in a user
-router.post('/admin', authMiddleware, UserController.createAdmin);  // Route to create a new admin user
+router.post('/register', UserController.registerUser);                    // Route to register a new user
+router.post('/login', UserController.loginUser);                          // Route to log in a user
+router.post('/admin', authMiddleware, UserController.createAdmin);        // Route to create a new admin user
+router.delete('/delete/:id', authMiddleware, UserController.deleteUser);  // Route to delete users
+
 
 module.exports = router;

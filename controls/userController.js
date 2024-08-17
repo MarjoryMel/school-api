@@ -78,6 +78,7 @@ exports.loginUser = async (req, res) => {
     }
 };
 
+// Create new administrators (only admins can)
 exports.createAdmin = async (req, res) => {
     const { username, email, password } = req.body;
 
@@ -122,4 +123,40 @@ exports.createAdmin = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+// Delete only users (only admins can)
+exports.deleteUser = async (req, res) => {
+    // User ID to be deleted
+    const { id } = req.params;
+
+    try {
+        // Checks if the authenticated user is an administrator
+        if (!req.user.isAdmin) {
+            console.log('Access denied. Only admins can delete users.');
+            return res.status(403).json({ message: 'Access denied. Only admins can delete users.' });
+        }
+
+        // Checks if the authenticated user is trying to delete another administrator
+        const userToDelete = await User.findById(id);
+        if (!userToDelete) {
+            console.log('User not found');
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (userToDelete.isAdmin) {
+            console.log('Admin users cannot be deleted by other admins.');
+            return res.status(403).json({ message: 'Admin users cannot be deleted by other admins.' });
+        }
+
+        // Delete the user
+        await User.findByIdAndDelete(id);
+        console.log('User deleted successfully:', userToDelete);
+
+        res.status(200).json({ message: 'User deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting user:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+};
+
 
