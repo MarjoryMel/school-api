@@ -7,6 +7,6 @@ router.post('/register', UserController.registerUser);                    // Rou
 router.post('/login', UserController.loginUser);                          // Route to log in a user
 router.post('/admin', authMiddleware, UserController.createAdmin);        // Route to create a new admin user
 router.delete('/delete/:id', authMiddleware, UserController.deleteUser);  // Route to delete users
-
+router.put('/update/:id', authMiddleware, UserController.updateUser);     // Route to update user data
 
 module.exports = router;

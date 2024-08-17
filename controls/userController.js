@@ -160,4 +160,50 @@ exports.deleteUser = async (req, res) => {
     }
 };
 
+// Update user data (only the user himself or an admin)
+exports.updateUser = async (req, res) => {
+    const { id } = req.params;
+    const { username, email, password } = req.body;
+
+    try {
+        // Check if the authenticated user is an admin or if the user is updating their own data
+        if (!req.user.isAdmin) {
+            // If not an admin, ensure the user is updating their own data
+            if (req.user.userId !== id) {
+                console.log('Access denied. Users can only update their own data.');
+                return res.status(403).json({ message: 'Access denied. Users can only update their own data.' });
+            }
+        }
+
+        // Find and update the user
+        const updateData = { username, email, password };
+        if (password) {
+            // Hash the password if provided
+            const salt = await bcrypt.genSalt(10);
+            updateData.password = await bcrypt.hash(password, salt);
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(id, updateData, { new: true });
+        if (!updatedUser) {
+            console.log('User not found');
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        console.log('User updated successfully:', updatedUser);
+
+        res.status(200).json({
+            message: 'User updated successfully',
+            user: {
+                id: updatedUser._id,
+                username: updatedUser.username,
+                email: updatedUser.email,
+                isAdmin: updatedUser.isAdmin
+            }
+        });
+    } catch (error) {
+        console.error('Error updating user:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+};
+
 
