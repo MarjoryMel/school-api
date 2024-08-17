@@ -60,3 +60,33 @@ exports.createProfessor = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+
+// Get professor details by ID
+exports.getProfessor = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Find professor by ID
+        const professor = await Professor.findById(id);
+
+        if (!professor) {
+            return res.status(404).json({ message: 'Professor not found' });
+        }
+
+        res.status(200).json({
+            professor: {
+                id: professor._id,
+                userId: professor.user,
+                firstName: professor.firstName,
+                lastName: professor.lastName,
+                department: professor.department,
+                courses: professor.courses,
+                officeLocation: professor.officeLocation
+            }
+        });
+    } catch (error) {
+        console.error('Error retrieving professor:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+};
