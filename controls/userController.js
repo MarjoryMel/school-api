@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const authMiddleware = require('../utils/middlewares');
+const Professor = require('../models/professorModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -36,21 +37,15 @@ exports.loginUser = async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        console.log('Logging in user with username:', username);
-
-        // Check if the user exists
+        // Find the user by username
         const user = await User.findOne({ username });
         if (!user) {
-            console.log('User not found');
             return res.status(401).json({ message: 'Invalid username or password' });
         }
 
-        // Check the password
+        // Compare the provided password with the stored password
         const isMatch = await bcrypt.compare(password, user.password);
-        console.log('Password match result:', isMatch);
-
         if (!isMatch) {
-            console.log('Invalid password');
             return res.status(401).json({ message: 'Invalid username or password' });
         }
 
@@ -60,7 +55,9 @@ exports.loginUser = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
-        console.log('Generated token:', token);
+
+        // Find professor by userId
+        const professor = await Professor.findOne({ userId: user._id });
 
         res.status(200).json({
             message: 'Login successful',
@@ -69,15 +66,21 @@ exports.loginUser = async (req, res) => {
                 id: user._id,
                 username: user.username,
                 email: user.email,
-                isAdmin: user.isAdmin
+                isAdmin: user.isAdmin,
+                isProfessor: !!professor,
+                professor: professor ? {
+                    firstName: professor.firstName,
+                    lastName: professor.lastName,
+                    department: professor.department,
+                    courses: professor.courses,
+                    officeLocation: professor.officeLocation
+                } : null
             }
         });
     } catch (error) {
-        console.error('Error logging in user:', error.message);
         res.status(500).json({ error: error.message });
     }
 };
-
 
 // Create new administrators (only admins can)
 exports.createAdmin = async (req, res) => {

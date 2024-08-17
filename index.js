@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 
 // Import user routes
 const userRoutes = require("./routes/userRoutes");
+const professorRoutes = require("./routes/professorRoutes");
 
 // Import the function to initialize the default admin
 const initializeAdmin = require('./utils/initializeAdmin'); 
@@ -28,6 +29,7 @@ mongoose.connect(process.env.MONGO_URI)
 
 // Use user routes under the '/api/users' path
 app.use('/api/users', userRoutes);
+app.use('/api/professor', professorRoutes);
 
 
 app.use((err, req, res, next) => {
