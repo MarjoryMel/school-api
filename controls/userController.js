@@ -18,7 +18,7 @@ exports.registerUser = async (req, res) => {
         res.status(201).json({
             message: 'User registered successfully',
             user: {
-                id: newUser._id,  // Include the user's ID in the response
+                id: newUser._id, 
                 username: newUser.username,
                 email: newUser.email,
                 isAdmin: newUser.isAdmin
@@ -33,16 +33,16 @@ exports.registerUser = async (req, res) => {
 
 // Log in user
 exports.loginUser = async (req, res) => {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
     try {
-        console.log('Logging in user with email:', email);
+        console.log('Logging in user with username:', username);
 
         // Check if the user exists
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ username });
         if (!user) {
             console.log('User not found');
-            return res.status(401).json({ message: 'Invalid email or password' });
+            return res.status(401).json({ message: 'Invalid username or password' });
         }
 
         // Check the password
@@ -51,7 +51,7 @@ exports.loginUser = async (req, res) => {
 
         if (!isMatch) {
             console.log('Invalid password');
-            return res.status(401).json({ message: 'Invalid email or password' });
+            return res.status(401).json({ message: 'Invalid username or password' });
         }
 
         // Generate JWT token
@@ -77,6 +77,7 @@ exports.loginUser = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
 
 // Create new administrators (only admins can)
 exports.createAdmin = async (req, res) => {
@@ -112,7 +113,7 @@ exports.createAdmin = async (req, res) => {
         res.status(201).json({
             message: 'Admin created successfully',
             user: {
-                id: newAdmin._id,  // Include the admin's ID in the response
+                id: newAdmin._id, 
                 username: newAdmin.username,
                 email: newAdmin.email,
                 isAdmin: newAdmin.isAdmin
