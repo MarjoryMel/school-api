@@ -178,6 +178,36 @@ exports.deleteProfessor = async (req, res) => {
     }
 };
 
+// List all professors (accessible by any user)
+exports.listProfessors = async (req, res) => {
+    try {
+        // Retrieve all professors from the database
+        const professors = await Professor.find();
+        
+        // Check if there are no professors
+        if (professors.length === 0) {
+            return res.status(404).json({ message: 'No professors found' });
+        }
+
+        // Respond with the list of professors
+        return res.status(200).json({
+            message: 'Professors retrieved successfully',
+            professors: professors.map(professor => ({
+                id: professor._id,
+                userId: professor.userId,
+                firstName: professor.firstName,
+                lastName: professor.lastName,
+                department: professor.department,
+                courses: professor.courses,
+                officeLocation: professor.officeLocation
+            }))
+        });
+    } catch (error) {
+        console.error('Error retrieving professors:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+};
+
 
 
 

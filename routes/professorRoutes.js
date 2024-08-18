@@ -7,5 +7,6 @@ router.post('/create', authMiddleware, ProfessorController.createProfessor); // 
 router.get('/:id', authMiddleware, ProfessorController.getProfessor);        // Route to find a teacher
 router.put('/:id', authMiddleware, ProfessorController.updateProfessor);     // Route to update a teacher's information
 router.delete('/:id', authMiddleware, ProfessorController.deleteProfessor);  // Route to delete a professor
+router.get('/', ProfessorController.listProfessors);                         // Route to list all professors
 
 module.exports = router;
