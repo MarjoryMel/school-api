@@ -90,3 +90,57 @@ exports.getProfessor = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+
+// Update professor details (only admins or the professor themselves can)
+exports.updateProfessor = async (req, res) => {
+    const { id } = req.params;
+    const updates = req.body; 
+
+    try {
+        // Find the professor by ID
+        const professor = await Professor.findById(id);
+        if (!professor) {
+            return res.status(404).json({ message: 'Professor not found' });
+        }
+
+        // Check if req.user and professor.userId are defined
+        if (!req.user || !req.user.userId || !professor.userId) {
+            return res.status(500).json({ message: 'User or professor ID is missing' });
+        }
+
+        // Check if the authenticated user is an admin or the professor themselves
+        const isAdminOrSelf = req.user.isAdmin || req.user.userId.toString() === professor.userId.toString();
+
+        if (isAdminOrSelf) {
+            // Update the professor details
+            Object.keys(updates).forEach((key) => {
+                professor[key] = updates[key];
+            });
+
+            await professor.save();
+            console.log('Professor updated successfully:', professor);
+
+            return res.status(200).json({
+                message: 'Professor updated successfully',
+                professor: {
+                    id: professor._id,
+                    userId: professor.userId,
+                    firstName: professor.firstName,
+                    lastName: professor.lastName,
+                    department: professor.department,
+                    courses: professor.courses,
+                    officeLocation: professor.officeLocation
+                }
+            });
+        } else {
+            return res.status(403).json({ message: 'Access denied. Admins or the professor only.' });
+        }
+    } catch (error) {
+        console.error('Error updating professor:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+
