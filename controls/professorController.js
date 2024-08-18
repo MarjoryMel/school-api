@@ -142,5 +142,42 @@ exports.updateProfessor = async (req, res) => {
     }
 };
 
+// Delete a professor (only admins can)
+exports.deleteProfessor = async (req, res) => {
+    const { id } = req.params; 
+
+    try {
+        // Check if the authenticated user is an admin
+        if (!req.user.isAdmin) {
+            return res.status(403).json({ message: 'Access denied. Admins only.' });
+        }
+
+        // Find and delete the professor by ID
+        const professor = await Professor.findByIdAndDelete(id);
+        if (!professor) {
+            return res.status(404).json({ message: 'Professor not found' });
+        }
+
+        console.log('Professor deleted successfully:', professor);
+
+        return res.status(200).json({
+            message: 'Professor deleted successfully',
+            professor: {
+                id: professor._id,
+                userId: professor.userId,
+                firstName: professor.firstName,
+                lastName: professor.lastName,
+                department: professor.department,
+                courses: professor.courses,
+                officeLocation: professor.officeLocation
+            }
+        });
+    } catch (error) {
+        console.error('Error deleting professor:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
 
 
