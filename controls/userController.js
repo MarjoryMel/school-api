@@ -1,12 +1,18 @@
 const User = require('../models/userModel');
-const authMiddleware = require('../utils/middlewares');
 const Professor = require('../models/professorModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { registerUserSchema, updateUserSchema, createAdminSchema, loginUserSchema } = require('../validators/userValidator');
 
 // Register a new user
 exports.registerUser = async (req, res) => {
     const { username, email, password } = req.body;
+
+    // Validate request body
+    const { error } = registerUserSchema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
 
     try {
         console.log('Registering user:', { username, email });
@@ -19,7 +25,7 @@ exports.registerUser = async (req, res) => {
         res.status(201).json({
             message: 'User registered successfully',
             user: {
-                id: newUser._id, 
+                id: newUser._id,
                 username: newUser.username,
                 email: newUser.email,
                 isAdmin: newUser.isAdmin
@@ -31,10 +37,15 @@ exports.registerUser = async (req, res) => {
     }
 };
 
-
 // Log in user
 exports.loginUser = async (req, res) => {
     const { username, password } = req.body;
+
+    // Validate request body
+    const { error } = loginUserSchema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
 
     try {
         // Find the user by username
@@ -86,6 +97,12 @@ exports.loginUser = async (req, res) => {
 exports.createAdmin = async (req, res) => {
     const { username, email, password } = req.body;
 
+    // Validate request body
+    const { error } = createAdminSchema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
+
     try {
         // Check if the authenticated user is an admin
         if (!req.user.isAdmin) {
@@ -116,7 +133,7 @@ exports.createAdmin = async (req, res) => {
         res.status(201).json({
             message: 'Admin created successfully',
             user: {
-                id: newAdmin._id, 
+                id: newAdmin._id,
                 username: newAdmin.username,
                 email: newAdmin.email,
                 isAdmin: newAdmin.isAdmin
@@ -168,6 +185,12 @@ exports.updateUser = async (req, res) => {
     const { id } = req.params;
     const { username, email, password } = req.body;
 
+    // Validate request body
+    const { error } = updateUserSchema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
+
     try {
         // Check if the authenticated user is an admin or if the user is updating their own data
         if (!req.user.isAdmin) {
@@ -208,5 +231,3 @@ exports.updateUser = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
-
