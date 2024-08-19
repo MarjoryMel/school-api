@@ -5,5 +5,7 @@ const authMiddleware = require('../utils/middlewares');
 
 router.post('/', authMiddleware, StudentController.createStudent); // Route to create a new student
 router.get('/:enrollmentNumber', authMiddleware, StudentController.getStudent);
+router.put('/:enrollmentNumber', authMiddleware, StudentController.updateStudent);
+
 
 module.exports = router;

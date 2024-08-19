@@ -1,5 +1,5 @@
 const { generateEnrollmentNumber } = require('../utils/support');
-const { studentValidator } = require('../validators/studentValidator');
+const { studentCreationValidator, studentUpdateValidator } = require('../validators/studentValidator');
 const { generateErrorMessages } = require('../utils/errorMessages');
 const Student = require('../models/studentModel');
 
@@ -13,7 +13,7 @@ exports.createStudent = async (req, res) => {
     const { userId, firstName, lastName, courses, dateOfBirth } = req.body;
 
     // Validate the request body
-    const { error } = studentValidator.validate({ userId, firstName, lastName, courses, dateOfBirth });
+    const { error } = studentCreationValidator.validate({ userId, firstName, lastName, courses, dateOfBirth });
     if (error) {
         return res.status(400).json({ message: generateErrorMessages('VALIDATION_ERROR') });
     }
@@ -56,3 +56,41 @@ exports.getStudent = async (req, res) => {
     }
 };
 
+// Update student details (only admins or the student themselves can)
+exports.updateStudent = async (req, res) => {
+    const { enrollmentNumber } = req.params; 
+    const updates = req.body;
+
+    try {
+        // Find the student by enrollment number
+        const student = await Student.findOne({ enrollmentNumber }); 
+        if (!student) {
+            return res.status(404).json({ message: generateErrorMessages('STUDENT_NOT_FOUND') });
+        }
+
+        // Validate the request body
+        const { error } = studentUpdateValidator.validate(updates);
+        if (error) {
+            return res.status(400).json({ message: error.details[0].message });
+        }
+
+        // Check if the authenticated user is an admin or the student themselves
+        const isAdminOrSelf = req.user.isAdmin || req.user.userId.toString() === student.userId.toString();
+        if (isAdminOrSelf) {
+            // Update the student details
+            Object.keys(updates).forEach((key) => {
+                student[key] = updates[key];
+            });
+            await student.save();
+            return res.status(200).json({
+                message: 'Student updated successfully',
+                student: { id: student._id, userId: student.userId, firstName: student.firstName, lastName: student.lastName, enrollmentNumber: student.enrollmentNumber, courses: student.courses, dateOfBirth: student.dateOfBirth }
+            });
+        } else {
+            return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
+        }
+    } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).json({ message: generateErrorMessages('INTERNAL_ERROR') });
+    }
+};
