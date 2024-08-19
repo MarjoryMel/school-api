@@ -29,7 +29,8 @@ const generateErrorMessages = (type, details = {}) => {
         'VALIDATION_ERROR': 'Validation error occurred.',
         'INTERNAL_ERROR': 'An internal error occurred.',
         'COURSE_ALREADY_EXISTS': 'A course with this title already exists.',
-        'STUDENT_NOT_FOUND': 'Student not found.'
+        'STUDENT_NOT_FOUND': 'Student not found.',
+        'COURSE_NOT_FOUND': 'Course not found.'
     };
 
     return messages[type] || 'Unknown error.';

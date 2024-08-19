@@ -1,4 +1,5 @@
 const Course = require('../models/courseModel');
+const Student = require('../models/studentModel');
 const User = require('../models/userModel');
 const { courseCreationValidator, courseUpdateValidator } = require('../validators/courseValidator');
 const { generateErrorMessages } = require('../utils/errorMessages');
@@ -97,6 +98,36 @@ exports.updateCourse = async (req, res) => {
         });
     } catch (error) {
         console.error('Error updating course:', error.message);
+        res.status(500).json({ message: generateErrorMessages('INTERNAL_ERROR') });
+    }
+};
+
+// Delete a course (only admins can)
+exports.deleteCourse = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Check if the authenticated user is an admin
+        if (!req.user.isAdmin) {
+            return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
+        }
+
+        // Find and delete the course by ID
+        const course = await Course.findByIdAndDelete(id);
+        if (!course) {
+            return res.status(404).json({ message: generateErrorMessages('COURSE_NOT_FOUND') });
+        }
+        
+        // Remove the course reference from the students' courses array
+        await Student.updateMany({ courses: id }, { $pull: { courses: id } });
+
+        console.log('Course deleted successfully:', course);
+        return res.status(200).json({
+            message: 'Course deleted successfully',
+            course: { id: course._id, title: course.title, department: course.department }
+        });
+    } catch (error) {
+        console.error('Error:', error.message);
         res.status(500).json({ message: generateErrorMessages('INTERNAL_ERROR') });
     }
 };

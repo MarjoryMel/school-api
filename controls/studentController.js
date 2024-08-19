@@ -71,12 +71,12 @@ exports.getStudent = async (req, res) => {
 
 // Update student details (only admins or the student themselves can)
 exports.updateStudent = async (req, res) => {
-    const { enrollmentNumber } = req.params; 
+    const { enrollmentNumber } = req.params;
     const updates = req.body;
 
     try {
         // Find the student by enrollment number
-        const student = await Student.findOne({ enrollmentNumber }); 
+        const student = await Student.findOne({ enrollmentNumber });
         if (!student) {
             return res.status(404).json({ message: generateErrorMessages('STUDENT_NOT_FOUND') });
         }
@@ -90,10 +90,39 @@ exports.updateStudent = async (req, res) => {
         // Check if the authenticated user is an admin or the student themselves
         const isAdminOrSelf = req.user.isAdmin || req.user.userId.toString() === student.userId.toString();
         if (isAdminOrSelf) {
-            // Update the student details
+            // Remove the student from the old courses
+            if (student.courses && Array.isArray(student.courses)) {
+                for (const courseId of student.courses) {
+                    const course = await Course.findById(courseId);
+                    if (course) {
+                        // Remove the student from the course's students array
+                        course.students = course.students.filter(studentId => !studentId.equals(student._id));
+                        await course.save();
+                    }
+                }
+            }
+
+            // Update student details
             Object.keys(updates).forEach((key) => {
                 student[key] = updates[key];
             });
+
+            // If the courses array is being updated
+            if (updates.courses && Array.isArray(updates.courses)) {
+                // Set the new list of courses
+                student.courses = updates.courses;
+
+                // Add the student to the new courses
+                for (const courseId of student.courses) {
+                    const course = await Course.findById(courseId);
+                    if (course) {
+                        if (!course.students.includes(student._id)) {
+                            course.students.push(student._id);
+                            await course.save();
+                        }
+                    }
+                }
+            }
             await student.save();
             return res.status(200).json({
                 message: 'Student updated successfully',
@@ -107,6 +136,8 @@ exports.updateStudent = async (req, res) => {
         res.status(500).json({ message: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
+
+
 
 // Delete a student (only admins can)
 exports.deleteStudent = async (req, res) => {
