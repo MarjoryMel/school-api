@@ -1,7 +1,8 @@
+const Student = require('../models/studentModel');
+const Course = require('../models/courseModel');
 const { generateEnrollmentNumber } = require('../utils/support');
 const { studentCreationValidator, studentUpdateValidator } = require('../validators/studentValidator');
 const { generateErrorMessages } = require('../utils/errorMessages');
-const Student = require('../models/studentModel');
 
 // Function to create a new student (only admins can)
 exports.createStudent = async (req, res) => {
@@ -25,6 +26,20 @@ exports.createStudent = async (req, res) => {
         // Create a new student
         const newStudent = new Student({ userId, firstName, lastName, enrollmentNumber, courses, dateOfBirth });
         await newStudent.save();
+
+        // Add the new student to the specified courses
+        if (courses && Array.isArray(courses)) {
+            for (const courseId of courses) {
+                const course = await Course.findById(courseId);
+                if (course) {
+                    if (!course.students.includes(newStudent._id)) {
+                        course.students.push(newStudent._id);
+                        await course.save();
+                    }
+                }
+            }
+        }
+
         res.status(201).json({
             message: 'Student created successfully',
             student: { id: newStudent._id, userId: newStudent.userId, firstName: newStudent.firstName, lastName: newStudent.lastName, enrollmentNumber: newStudent.enrollmentNumber,  courses: newStudent.courses,  dateOfBirth: newStudent.dateOfBirth }

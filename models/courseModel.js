@@ -16,6 +16,10 @@ const courseSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Professor'
     }],
+    students: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Student' 
+    }]
 }, {
     timestamps: true
 });

@@ -5,10 +5,10 @@ const { generateErrorMessages } = require('../utils/errorMessages');
 
 // Create a new course (only admins can)
 exports.createCourse = async (req, res) => {
-    const { title, department, professors } = req.body;
+    const { title, department, professors, students } = req.body;
 
     // Validate the course data
-    const { error } = courseValidator.validate({ title, department, professors });
+    const { error } = courseValidator.validate({ title, department, professors, students });
     if (error) {
         return res.status(400).json({ message: generateErrorMessages('VALIDATION_ERROR') });
     }
@@ -26,12 +26,12 @@ exports.createCourse = async (req, res) => {
         }
 
         // Create a new course
-        const newCourse = new Course({ title, department,professors});
+        const newCourse = new Course({ title, department, professors, students });
         await newCourse.save();
         console.log('Course created successfully:', newCourse);
         res.status(201).json({
             message: 'Course created successfully',
-            course: { id: newCourse._id, title: newCourse.title, department: newCourse.department, professors: newCourse.professors}
+            course: { id: newCourse._id, title: newCourse.title, department: newCourse.department, professors: newCourse.professors, students: newCourse.students }
         });
     } catch (error) {
         console.error('Error creating course:', error.message);
