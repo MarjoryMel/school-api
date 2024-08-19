@@ -25,8 +25,6 @@ exports.createStudent = async (req, res) => {
         // Create a new student
         const newStudent = new Student({ userId, firstName, lastName, enrollmentNumber, courses, dateOfBirth });
         await newStudent.save();
-
-        // Respond with the newly created student data
         res.status(201).json({
             message: 'Student created successfully',
             student: { id: newStudent._id, userId: newStudent.userId, firstName: newStudent.firstName, lastName: newStudent.lastName, enrollmentNumber: newStudent.enrollmentNumber,  courses: newStudent.courses,  dateOfBirth: newStudent.dateOfBirth }
@@ -94,3 +92,30 @@ exports.updateStudent = async (req, res) => {
         res.status(500).json({ message: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
+
+// Delete a student (only admins can)
+exports.deleteStudent = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Check if the authenticated user is an admin
+        if (!req.user.isAdmin) {
+            return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
+        }
+
+        // Find and delete the student by ID
+        const student = await Student.findByIdAndDelete(id);
+        if (!student) {
+            return res.status(404).json({ message: generateErrorMessages('STUDENT_NOT_FOUND') });
+        }
+        console.log('Student deleted successfully:', student);
+        return res.status(200).json({
+            message: 'Student deleted successfully',
+            student: { id: student._id, userId: student.userId, firstName: student.firstName, lastName: student.lastName, enrollmentNumber: student.enrollmentNumber,courses: student.courses, dateOfBirth: student.dateOfBirth }
+        });
+    } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
+    }
+};
+
