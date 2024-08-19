@@ -1,6 +1,6 @@
 const Course = require('../models/courseModel');
 const User = require('../models/userModel');
-const { courseValidator } = require('../validators/courseValidator');
+const { courseCreationValidator, courseUpdateValidator } = require('../validators/courseValidator');
 const { generateErrorMessages } = require('../utils/errorMessages');
 
 // Create a new course (only admins can)
@@ -8,7 +8,7 @@ exports.createCourse = async (req, res) => {
     const { title, department, professors, students } = req.body;
 
     // Validate the course data
-    const { error } = courseValidator.validate({ title, department, professors, students });
+    const { error } = courseCreationValidator.validate({ title, department, professors, students });
     if (error) {
         return res.status(400).json({ message: generateErrorMessages('VALIDATION_ERROR') });
     }
@@ -53,16 +53,50 @@ exports.getCourse = async (req, res) => {
         // Return the course details with only IDs for professors and students
         return res.status(200).json({
             message: 'Course retrieved successfully',
-            course: {
-                id: course._id,
-                title: course.title,
-                department: course.department,
-                professors: course.professors.map(professor => professor._id),
-                students: course.students.map(student => student._id)
-            }
+            course: { id: course._id, title: course.title, department: course.department, professors: course.professors.map(professor => professor._id), students: course.students.map(student => student._id)}
         });
     } catch (error) {
         console.error('Error retrieving course:', error.message);
+        res.status(500).json({ message: generateErrorMessages('INTERNAL_ERROR') });
+    }
+};
+
+// Update course details (only admins can)
+exports.updateCourse = async (req, res) => {
+    const { id } = req.params;
+    const updates = req.body;
+
+    try {
+        // Check if the authenticated user is an admin
+        if (!req.user.isAdmin) {
+            return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
+        }
+
+        // Validate the request body
+        const { error } = courseUpdateValidator.validate(updates);
+        if (error) {
+            return res.status(400).json({ message: error.details[0].message });
+        }
+
+        // Find the course by ID
+        const course = await Course.findById(id);
+        if (!course) {
+            return res.status(404).json({ message: generateErrorMessages('COURSE_NOT_FOUND') });
+        }
+
+        // Update the course details
+        Object.keys(updates).forEach(key => {
+            course[key] = updates[key];
+        });
+        await course.save();
+
+        // Return the updated course details
+        return res.status(200).json({
+            message: 'Course updated successfully',
+            course: { id: course._id, title: course.title, department: course.department, professors: course.professors, students: course.students }
+        });
+    } catch (error) {
+        console.error('Error updating course:', error.message);
         res.status(500).json({ message: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
