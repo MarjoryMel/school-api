@@ -119,3 +119,25 @@ exports.deleteStudent = async (req, res) => {
     }
 };
 
+// List all students (accessible by any user)
+exports.listStudents = async (req, res) => {
+    try {
+        // Find all students
+        const students = await Student.find();
+
+        // Check if any students are found
+        if (students.length === 0) {
+            return res.status(404).json({ message: generateErrorMessages('NO_STUDENTS_FOUND') });
+        }
+
+        // Return the list of students
+        return res.status(200).json({
+            message: 'Students retrieved successfully',
+            students: students.map(student => ({ id: student._id, userId: student.userId, firstName: student.firstName, lastName: student.lastName, enrollmentNumber: student.enrollmentNumber, courses: student.courses, dateOfBirth: student.dateOfBirth }))
+        });
+    } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).json({ message: generateErrorMessages('INTERNAL_ERROR') });
+    }
+};
+
