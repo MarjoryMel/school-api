@@ -95,7 +95,6 @@ exports.updateStudent = async (req, res) => {
                 for (const courseId of student.courses) {
                     const course = await Course.findById(courseId);
                     if (course) {
-                        // Remove the student from the course's students array
                         course.students = course.students.filter(studentId => !studentId.equals(student._id));
                         await course.save();
                     }

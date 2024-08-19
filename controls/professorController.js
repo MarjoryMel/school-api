@@ -1,7 +1,7 @@
 const Professor = require('../models/professorModel');
 const Course = require('../models/courseModel');
 const User = require('../models/userModel');
-const { professorValidator } = require('../validators/professorValidator');
+const { professorCreationValidator, professorUpdateValidator } = require('../validators/professorValidator');
 const { generateErrorMessages } = require('../utils/errorMessages');
 
 // Create a new professor (only admins can)
@@ -14,7 +14,7 @@ exports.createProfessor = async (req, res) => {
     const { userId, firstName, lastName, courses, officeLocation } = req.body;
 
     // Validate the request body
-    const { error } = professorValidator.validate({ userId, firstName, lastName, courses, officeLocation });
+    const { error } = professorCreationValidator.validate({ userId, firstName, lastName, courses, officeLocation });
     if (error) {
         return res.status(400).json({ message: error.details[0].message });
     }
@@ -89,7 +89,7 @@ exports.updateProfessor = async (req, res) => {
         }
 
         // Validate the request body
-        const { error } = professorValidator.validate(updates);
+        const { error } = professorUpdateValidator.validate(updates);
         if (error) {
             return res.status(400).json({ message: error.details[0].message });
         }
@@ -97,15 +97,44 @@ exports.updateProfessor = async (req, res) => {
         // Check if the authenticated user is an admin or the professor themselves
         const isAdminOrSelf = req.user.isAdmin || req.user.userId.toString() === professor.userId.toString();
         if (isAdminOrSelf) {
-            // Update the professor details
+            // Remove the professor from the old courses
+            if (professor.courses && Array.isArray(professor.courses)) {
+                for (const courseId of professor.courses) {
+                    const course = await Course.findById(courseId);
+                    if (course) {
+                        // Remove the professor from the course's professors array
+                        course.professors = course.professors.filter(professorId => !professorId.equals(professor._id));
+                        await course.save();
+                    }
+                }
+            }
+
+            // Update professor details
             Object.keys(updates).forEach((key) => {
                 professor[key] = updates[key];
             });
+
+            // If the courses array is being updated
+            if (updates.courses && Array.isArray(updates.courses)) {
+                // Set the new list of courses
+                professor.courses = updates.courses;
+
+                // Add the professor to the new courses
+                for (const courseId of professor.courses) {
+                    const course = await Course.findById(courseId);
+                    if (course) {
+                        if (!course.professors.includes(professor._id)) {
+                            course.professors.push(professor._id);
+                            await course.save();
+                        }
+                    }
+                }
+            }
+
             await professor.save();
             return res.status(200).json({
                 message: 'Professor updated successfully',
-                professor: { id: professor._id, userId: professor.userId, firstName: professor.firstName, lastName: professor.lastName, courses: professor.courses, officeLocation: professor.officeLocation
-                }
+                professor: { id: professor._id, userId: professor.userId, firstName: professor.firstName, lastName: professor.lastName, courses: professor.courses, officeLocation: professor.officeLocation }
             });
         } else {
             return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
