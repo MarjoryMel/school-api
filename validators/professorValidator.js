@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const { generateMessages } = require('../utils/errorMessages');
 
+// Define the schema for professor validation
 const professorValidator = Joi.object({
     userId: Joi.string().required().messages(generateMessages('userId')),
     firstName: Joi.string().min(2).max(50).required().messages(generateMessages('firstName', { min: 2, max: 50 })),

@@ -25,7 +25,6 @@ exports.createProfessor = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: generateErrorMessages('USER_NOT_FOUND') });
         }
-
         const existingProfessor = await Professor.findOne({ userId });
         if (existingProfessor) {
             return res.status(400).json({ message: generateErrorMessages('PROFESSOR_ALREADY_EXISTS') });
@@ -33,7 +32,6 @@ exports.createProfessor = async (req, res) => {
 
         // Create a new professor
         const newProfessor = new Professor({ userId, firstName, lastName, courses, officeLocation });
-
         await newProfessor.save();
 
         // Add the new professor to the specified courses
@@ -54,6 +52,7 @@ exports.createProfessor = async (req, res) => {
             professor: { id: newProfessor._id, userId: newProfessor.userId, firstName: newProfessor.firstName, lastName: newProfessor.lastName, courses: newProfessor.courses, officeLocation: newProfessor.officeLocation }
         });
     } catch (error) {
+        console.error('Error:', error.message);
         res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
@@ -65,15 +64,14 @@ exports.getProfessor = async (req, res) => {
     try {
         // Find professor by ID
         const professor = await Professor.findById(id);
-
         if (!professor) {
             return res.status(404).json({ message: generateErrorMessages('PROFESSOR_NOT_FOUND') });
         }
-
         res.status(200).json({
             professor: { id: professor._id, userId: professor.userId, firstName: professor.firstName, lastName: professor.lastName, courses: professor.courses, officeLocation: professor.officeLocation }
         });
     } catch (error) {
+        console.error('Error:', error.message);
         res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
@@ -103,9 +101,7 @@ exports.updateProfessor = async (req, res) => {
             Object.keys(updates).forEach((key) => {
                 professor[key] = updates[key];
             });
-
             await professor.save();
-
             return res.status(200).json({
                 message: 'Professor updated successfully',
                 professor: { id: professor._id, userId: professor.userId, firstName: professor.firstName, lastName: professor.lastName, courses: professor.courses, officeLocation: professor.officeLocation
@@ -115,6 +111,7 @@ exports.updateProfessor = async (req, res) => {
             return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
         }
     } catch (error) {
+        console.error('Error:', error.message);
         res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
@@ -134,14 +131,13 @@ exports.deleteProfessor = async (req, res) => {
         if (!professor) {
             return res.status(404).json({ message: generateErrorMessages('PROFESSOR_NOT_FOUND') });
         }
-
         console.log('Professor deleted successfully:', professor);
-
         return res.status(200).json({
             message: 'Professor deleted successfully',
             professor: { id: professor._id,userId: professor.userId,firstName: professor.firstName,lastName: professor.lastName,courses: professor.courses,officeLocation: professor.officeLocation }
         });
     } catch (error) {
+        console.error('Error:', error.message);
         res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
@@ -163,6 +159,7 @@ exports.listProfessors = async (req, res) => {
             professors: professors.map(professor => ({ id: professor._id,userId: professor.userId,firstName: professor.firstName,lastName: professor.lastName,courses: professor.courses, officeLocation: professor.officeLocation }))
         });
     } catch (error) {
+        console.error('Error:', error.message);
         res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
     }
 };

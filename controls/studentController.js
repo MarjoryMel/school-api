@@ -32,6 +32,7 @@ exports.createStudent = async (req, res) => {
             student: { id: newStudent._id, userId: newStudent.userId, firstName: newStudent.firstName, lastName: newStudent.lastName, enrollmentNumber: newStudent.enrollmentNumber,  courses: newStudent.courses,  dateOfBirth: newStudent.dateOfBirth }
         });
     } catch (error) {
+        console.error('Error:', error.message);
         res.status(500).json({ message: generateErrorMessages('INTERNAL_ERROR') });
     }
 };

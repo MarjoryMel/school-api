@@ -11,13 +11,10 @@ const authMiddleware = (req, res, next) => {
     }
 
     try {
-        // Verify the token using JWT_SECRET
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        // Attach the decoded token data to the request object
         req.user = decoded;
         next();
     } catch (error) {
-        // Respond with an error if the token is invalid
         res.status(400).json({ message: 'Invalid token.' });
     }
 };

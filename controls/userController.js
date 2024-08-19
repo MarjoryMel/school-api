@@ -32,7 +32,6 @@ exports.registerUser = async (req, res) => {
         const newUser = new User({ username, email, password });
         await newUser.save();
         console.log('User registered successfully:', newUser);
-
         res.status(201).json({
             message: 'User registered successfully',
             user: { id: newUser._id,  username: newUser.username, email: newUser.email, isAdmin: newUser.isAdmin}
@@ -73,7 +72,6 @@ exports.loginUser = async (req, res) => {
 
         // Find professor by userId
         const professor = await Professor.findOne({ userId: user._id });
-
         res.status(200).json({
             message: 'Login successful',
             token,
@@ -82,6 +80,7 @@ exports.loginUser = async (req, res) => {
             }
         });
     } catch (error) {
+        console.error('Error:', error.message);
         res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
@@ -113,15 +112,14 @@ exports.createAdmin = async (req, res) => {
         // Create and save a new admin user
         const newAdmin = new User({username, email, password, isAdmin: true
         });
-
         await newAdmin.save();
         console.log('Admin created successfully:', newAdmin);
-
         res.status(201).json({
             message: 'Admin created successfully',
             user: { id: newAdmin._id, username: newAdmin.username, email: newAdmin.email, isAdmin: newAdmin.isAdmin }
         });
     } catch (error) {
+        console.error('Error:', error.message);
         res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
@@ -142,7 +140,6 @@ exports.deleteUser = async (req, res) => {
         if (!userToDelete) {
             return res.status(404).json({ message: generateErrorMessages('USER_NOT_FOUND') });
         }
-
         if (userToDelete.isAdmin) {
             return res.status(403).json({ message: generateErrorMessages('CANNOT_DELETE_ADMIN') });
         }
@@ -151,6 +148,7 @@ exports.deleteUser = async (req, res) => {
         await User.findByIdAndDelete(id);
         res.status(200).json({ message: 'User deleted successfully' });
     } catch (error) {
+        console.error('Error:', error.message);
         res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
@@ -194,6 +192,7 @@ exports.updateUser = async (req, res) => {
             user: { id: updatedUser._id, username: updatedUser.username, email: updatedUser.email, isAdmin: updatedUser.isAdmin }
         });
     } catch (error) {
+        console.error('Error:', error.message);
         res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
     }
 };

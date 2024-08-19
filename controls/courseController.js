@@ -19,12 +19,16 @@ exports.createCourse = async (req, res) => {
             return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
         }
 
+        // Check if a course with the same title already exists
+        const existingCourse = await Course.findOne({ title });
+        if (existingCourse) {
+            return res.status(400).json({ message: generateErrorMessages('COURSE_ALREADY_EXISTS') });
+        }
+
         // Create a new course
         const newCourse = new Course({ title, department,professors});
-
         await newCourse.save();
         console.log('Course created successfully:', newCourse);
-
         res.status(201).json({
             message: 'Course created successfully',
             course: { id: newCourse._id, title: newCourse.title, department: newCourse.department, professors: newCourse.professors}

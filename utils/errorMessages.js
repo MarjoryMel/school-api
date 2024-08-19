@@ -19,15 +19,16 @@ const generateErrorMessages = (type, details = {}) => {
     const messages = {
         'ACCESS_DENIED': 'Access denied. Admins only.',
         'USER_NOT_FOUND': 'User not found.',
+        'USER_CANNOT_UPDATE': 'Users can only update their own data.',
+        'USER_ALREADY_EXISTS': 'User with this email or username already exists.',
+        'INVALID_USERNAME_OR_PASSWORD': 'Invalid username or password.',
+        'CANNOT_DELETE_ADMIN': 'Admin users cannot be deleted by other admins.',
         'PROFESSOR_ALREADY_EXISTS': 'User is already a professor.',
         'PROFESSOR_NOT_FOUND': 'Professor not found.',
         'NO_PROFESSORS_FOUND': 'No professors found.',
         'VALIDATION_ERROR': 'Validation error occurred.',
         'INTERNAL_ERROR': 'An internal error occurred.',
-        'INVALID_USERNAME_OR_PASSWORD': 'Invalid username or password.',
-        'USER_ALREADY_EXISTS': 'User with this email or username already exists.',
-        'CANNOT_DELETE_ADMIN': 'Admin users cannot be deleted by other admins.',
-        'USER_CANNOT_UPDATE': 'Users can only update their own data.'
+        'COURSE_ALREADY_EXISTS': 'A course with this title already exists.'
     };
 
     return messages[type] || 'Unknown error.';
