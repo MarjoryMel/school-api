@@ -4,7 +4,7 @@ require("dotenv").config({ path: "./config/.env" });
 const path = require("path");
 const mongoose = require("mongoose");
 
-// Import user routes
+// Import routes
 const userRoutes = require("./routes/userRoutes");
 const professorRoutes = require("./routes/professorRoutes");
 const studentRoutes = require("./routes/studentRoutes");
@@ -25,7 +25,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 mongoose.connect(process.env.MONGO_URI)
     .then(() => {
         console.log("MongoDB connected");
-        return initializeAdmin(); // Execute the function to create the default admin
+        return initializeAdmin(); 
     })
     .catch(err => console.error("MongoDB connection error:", err));
 

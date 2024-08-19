@@ -2,20 +2,31 @@ const User = require('../models/userModel');
 const Professor = require('../models/professorModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { registerUserSchema, updateUserSchema, createAdminSchema, loginUserSchema } = require('../validators/userValidator');
+const { registerUserValidator, updateUserValidator, createAdminValidator, loginValidator } = require('../validators/userValidator');
+const { generateErrorMessages } = require('../utils/errorMessages');
 
 // Register a new user
 exports.registerUser = async (req, res) => {
     const { username, email, password } = req.body;
 
     // Validate request body
-    const { error } = registerUserSchema.validate(req.body);
+    const { error } = registerUserValidator.validate(req.body);
     if (error) {
         return res.status(400).json({ message: error.details[0].message });
     }
 
     try {
         console.log('Registering user:', { username, email });
+
+        // Check if the user already exists
+        const existingUserByEmail = await User.findOne({ email });
+        if (existingUserByEmail) {
+            return res.status(400).json({ message: generateErrorMessages('USER_ALREADY_EXISTS') });
+        }
+        const existingUserByUsername = await User.findOne({ username });
+        if (existingUserByUsername) {
+            return res.status(400).json({ message: generateErrorMessages('USER_ALREADY_EXISTS') });
+        }
 
         // Create a new user
         const newUser = new User({ username, email, password });
@@ -24,25 +35,18 @@ exports.registerUser = async (req, res) => {
 
         res.status(201).json({
             message: 'User registered successfully',
-            user: {
-                id: newUser._id,
-                username: newUser.username,
-                email: newUser.email,
-                isAdmin: newUser.isAdmin
-            }
+            user: { id: newUser._id,  username: newUser.username, email: newUser.email, isAdmin: newUser.isAdmin}
         });
     } catch (error) {
         console.error('Error registering user:', error.message);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
 
 // Log in user
 exports.loginUser = async (req, res) => {
     const { username, password } = req.body;
-
-    // Validate request body
-    const { error } = loginUserSchema.validate(req.body);
+    const { error } = loginValidator.validate(req.body);
     if (error) {
         return res.status(400).json({ message: error.details[0].message });
     }
@@ -51,13 +55,13 @@ exports.loginUser = async (req, res) => {
         // Find the user by username
         const user = await User.findOne({ username });
         if (!user) {
-            return res.status(401).json({ message: 'Invalid username or password' });
+            return res.status(401).json({ message: generateErrorMessages('INVALID_USERNAME_OR_PASSWORD') });
         }
 
         // Compare the provided password with the stored password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(401).json({ message: 'Invalid username or password' });
+            return res.status(401).json({ message: generateErrorMessages('INVALID_USERNAME_OR_PASSWORD') });
         }
 
         // Generate JWT token
@@ -73,23 +77,12 @@ exports.loginUser = async (req, res) => {
         res.status(200).json({
             message: 'Login successful',
             token,
-            user: {
-                id: user._id,
-                username: user.username,
-                email: user.email,
-                isAdmin: user.isAdmin,
-                isProfessor: !!professor,
-                professor: professor ? {
-                    firstName: professor.firstName,
-                    lastName: professor.lastName,
-                    department: professor.department,
-                    courses: professor.courses,
-                    officeLocation: professor.officeLocation
-                } : null
+            user: {id: user._id,username: user.username,email: user.email,isAdmin: user.isAdmin,isProfessor: !!professor, professor: professor ? 
+                { firstName: professor.firstName, lastName: professor.lastName, department: professor.department, courses: professor.courses, officeLocation: professor.officeLocation } : null
             }
         });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
 
@@ -98,7 +91,7 @@ exports.createAdmin = async (req, res) => {
     const { username, email, password } = req.body;
 
     // Validate request body
-    const { error } = createAdminSchema.validate(req.body);
+    const { error } = createAdminValidator.validate(req.body);
     if (error) {
         return res.status(400).json({ message: error.details[0].message });
     }
@@ -106,8 +99,7 @@ exports.createAdmin = async (req, res) => {
     try {
         // Check if the authenticated user is an admin
         if (!req.user.isAdmin) {
-            console.log('Access denied. User is not an admin.');
-            return res.status(403).json({ message: 'Access denied. Admins only.' });
+            return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
         }
 
         console.log('Creating admin user:', { username, email });
@@ -115,16 +107,11 @@ exports.createAdmin = async (req, res) => {
         // Check if the user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            console.log('User with this email already exists.');
-            return res.status(400).json({ message: 'User with this email already exists.' });
+            return res.status(400).json({ message: generateErrorMessages('USER_ALREADY_EXISTS') });
         }
 
         // Create and save a new admin user
-        const newAdmin = new User({
-            username,
-            email,
-            password,
-            isAdmin: true
+        const newAdmin = new User({username, email, password, isAdmin: true
         });
 
         await newAdmin.save();
@@ -132,16 +119,10 @@ exports.createAdmin = async (req, res) => {
 
         res.status(201).json({
             message: 'Admin created successfully',
-            user: {
-                id: newAdmin._id,
-                username: newAdmin.username,
-                email: newAdmin.email,
-                isAdmin: newAdmin.isAdmin
-            }
+            user: { id: newAdmin._id, username: newAdmin.username, email: newAdmin.email, isAdmin: newAdmin.isAdmin }
         });
     } catch (error) {
-        console.error('Error creating admin:', error.message);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
 
@@ -153,30 +134,24 @@ exports.deleteUser = async (req, res) => {
     try {
         // Checks if the authenticated user is an administrator
         if (!req.user.isAdmin) {
-            console.log('Access denied. Only admins can delete users.');
-            return res.status(403).json({ message: 'Access denied. Only admins can delete users.' });
+            return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
         }
 
         // Checks if the authenticated user is trying to delete another administrator
         const userToDelete = await User.findById(id);
         if (!userToDelete) {
-            console.log('User not found');
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ message: generateErrorMessages('USER_NOT_FOUND') });
         }
 
         if (userToDelete.isAdmin) {
-            console.log('Admin users cannot be deleted by other admins.');
-            return res.status(403).json({ message: 'Admin users cannot be deleted by other admins.' });
+            return res.status(403).json({ message: generateErrorMessages('CANNOT_DELETE_ADMIN') });
         }
 
         // Delete the user
         await User.findByIdAndDelete(id);
-        console.log('User deleted successfully:', userToDelete);
-
         res.status(200).json({ message: 'User deleted successfully' });
     } catch (error) {
-        console.error('Error deleting user:', error.message);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
 
@@ -186,7 +161,7 @@ exports.updateUser = async (req, res) => {
     const { username, email, password } = req.body;
 
     // Validate request body
-    const { error } = updateUserSchema.validate(req.body);
+    const { error } = updateUserValidator.validate(req.body);
     if (error) {
         return res.status(400).json({ message: error.details[0].message });
     }
@@ -196,8 +171,7 @@ exports.updateUser = async (req, res) => {
         if (!req.user.isAdmin) {
             // If not an admin, ensure the user is updating their own data
             if (req.user.userId !== id) {
-                console.log('Access denied. Users can only update their own data.');
-                return res.status(403).json({ message: 'Access denied. Users can only update their own data.' });
+                return res.status(403).json({ message: generateErrorMessages('USER_CANNOT_UPDATE') });
             }
         }
 
@@ -211,23 +185,15 @@ exports.updateUser = async (req, res) => {
 
         const updatedUser = await User.findByIdAndUpdate(id, updateData, { new: true });
         if (!updatedUser) {
-            console.log('User not found');
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ message: generateErrorMessages('USER_NOT_FOUND') });
         }
 
         console.log('User updated successfully:', updatedUser);
-
         res.status(200).json({
             message: 'User updated successfully',
-            user: {
-                id: updatedUser._id,
-                username: updatedUser.username,
-                email: updatedUser.email,
-                isAdmin: updatedUser.isAdmin
-            }
+            user: { id: updatedUser._id, username: updatedUser.username, email: updatedUser.email, isAdmin: updatedUser.isAdmin }
         });
     } catch (error) {
-        console.error('Error updating user:', error.message);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
     }
 };

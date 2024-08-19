@@ -2,12 +2,13 @@ const Professor = require('../models/professorModel');
 const Course = require('../models/courseModel');
 const User = require('../models/userModel');
 const { professorValidator } = require('../validators/professorValidator');
+const { generateErrorMessages } = require('../utils/errorMessages');
 
 // Create a new professor (only admins can)
 exports.createProfessor = async (req, res) => {
     // Check if the authenticated user is an admin
     if (!req.user.isAdmin) {
-        return res.status(403).json({ message: 'Access denied. Admins only.' });
+        return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
     }
 
     const { userId, firstName, lastName, courses, officeLocation } = req.body;
@@ -22,22 +23,16 @@ exports.createProfessor = async (req, res) => {
         // Check if the user exists and is not already a professor
         const user = await User.findById(userId);
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ message: generateErrorMessages('USER_NOT_FOUND') });
         }
 
         const existingProfessor = await Professor.findOne({ userId });
         if (existingProfessor) {
-            return res.status(400).json({ message: 'User is already a professor' });
+            return res.status(400).json({ message: generateErrorMessages('PROFESSOR_ALREADY_EXISTS') });
         }
 
         // Create a new professor
-        const newProfessor = new Professor({
-            userId,
-            firstName,
-            lastName,
-            courses,
-            officeLocation
-        });
+        const newProfessor = new Professor({ userId, firstName, lastName, courses, officeLocation });
 
         await newProfessor.save();
 
@@ -56,21 +51,12 @@ exports.createProfessor = async (req, res) => {
 
         res.status(201).json({
             message: 'Professor created successfully',
-            professor: {
-                id: newProfessor._id,
-                userId: newProfessor.userId,
-                firstName: newProfessor.firstName,
-                lastName: newProfessor.lastName,
-                courses: newProfessor.courses,
-                officeLocation: newProfessor.officeLocation
-            }
+            professor: { id: newProfessor._id, userId: newProfessor.userId, firstName: newProfessor.firstName, lastName: newProfessor.lastName, courses: newProfessor.courses, officeLocation: newProfessor.officeLocation }
         });
     } catch (error) {
-        console.error('Error creating professor:', error.message);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
-
 
 // Get professor details by ID
 exports.getProfessor = async (req, res) => {
@@ -81,25 +67,16 @@ exports.getProfessor = async (req, res) => {
         const professor = await Professor.findById(id);
 
         if (!professor) {
-            return res.status(404).json({ message: 'Professor not found' });
+            return res.status(404).json({ message: generateErrorMessages('PROFESSOR_NOT_FOUND') });
         }
 
         res.status(200).json({
-            professor: {
-                id: professor._id,
-                userId: professor.user,
-                firstName: professor.firstName,
-                lastName: professor.lastName,
-                courses: professor.courses,
-                officeLocation: professor.officeLocation
-            }
+            professor: { id: professor._id, userId: professor.userId, firstName: professor.firstName, lastName: professor.lastName, courses: professor.courses, officeLocation: professor.officeLocation }
         });
     } catch (error) {
-        console.error('Error retrieving professor:', error.message);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
-
 
 // Update professor details (only admins or the professor themselves can)
 exports.updateProfessor = async (req, res) => {
@@ -110,7 +87,7 @@ exports.updateProfessor = async (req, res) => {
         // Find the professor by ID
         const professor = await Professor.findById(id);
         if (!professor) {
-            return res.status(404).json({ message: 'Professor not found' });
+            return res.status(404).json({ message: generateErrorMessages('PROFESSOR_NOT_FOUND') });
         }
 
         // Validate the request body
@@ -131,57 +108,41 @@ exports.updateProfessor = async (req, res) => {
 
             return res.status(200).json({
                 message: 'Professor updated successfully',
-                professor: {
-                    id: professor._id,
-                    userId: professor.userId,
-                    firstName: professor.firstName,
-                    lastName: professor.lastName,
-                    courses: professor.courses,
-                    officeLocation: professor.officeLocation
+                professor: { id: professor._id, userId: professor.userId, firstName: professor.firstName, lastName: professor.lastName, courses: professor.courses, officeLocation: professor.officeLocation
                 }
             });
         } else {
-            return res.status(403).json({ message: 'Access denied. Admins or the professor only.' });
+            return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
         }
     } catch (error) {
-        console.error('Error updating professor:', error.message);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
 
-
 // Delete a professor (only admins can)
 exports.deleteProfessor = async (req, res) => {
-    const { id } = req.params; 
+    const { id } = req.params;
 
     try {
         // Check if the authenticated user is an admin
         if (!req.user.isAdmin) {
-            return res.status(403).json({ message: 'Access denied. Admins only.' });
+            return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
         }
 
         // Find and delete the professor by ID
         const professor = await Professor.findByIdAndDelete(id);
         if (!professor) {
-            return res.status(404).json({ message: 'Professor not found' });
+            return res.status(404).json({ message: generateErrorMessages('PROFESSOR_NOT_FOUND') });
         }
 
         console.log('Professor deleted successfully:', professor);
 
         return res.status(200).json({
             message: 'Professor deleted successfully',
-            professor: {
-                id: professor._id,
-                userId: professor.userId,
-                firstName: professor.firstName,
-                lastName: professor.lastName,
-                courses: professor.courses,
-                officeLocation: professor.officeLocation
-            }
+            professor: { id: professor._id,userId: professor.userId,firstName: professor.firstName,lastName: professor.lastName,courses: professor.courses,officeLocation: professor.officeLocation }
         });
     } catch (error) {
-        console.error('Error deleting professor:', error.message);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
 
@@ -193,27 +154,15 @@ exports.listProfessors = async (req, res) => {
         
         // Check if there are no professors
         if (professors.length === 0) {
-            return res.status(404).json({ message: 'No professors found' });
+            return res.status(404).json({ message: generateErrorMessages('NO_PROFESSORS_FOUND') });
         }
 
         // Respond with the list of professors
         return res.status(200).json({
             message: 'Professors retrieved successfully',
-            professors: professors.map(professor => ({
-                id: professor._id,
-                userId: professor.userId,
-                firstName: professor.firstName,
-                lastName: professor.lastName,
-                courses: professor.courses,
-                officeLocation: professor.officeLocation
-            }))
+            professors: professors.map(professor => ({ id: professor._id,userId: professor.userId,firstName: professor.firstName,lastName: professor.lastName,courses: professor.courses, officeLocation: professor.officeLocation }))
         });
     } catch (error) {
-        console.error('Error retrieving professors:', error.message);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
-
-
-
-
