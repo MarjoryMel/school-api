@@ -36,3 +36,23 @@ exports.createStudent = async (req, res) => {
         res.status(500).json({ message: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
+
+// Get student details by enrollment number (any authenticated user with a valid token)
+exports.getStudent = async (req, res) => {
+    const { enrollmentNumber } = req.params;
+
+    try {
+        // Find student by enrollment number
+        const student = await Student.findOne({ enrollmentNumber });
+        if (!student) {
+            return res.status(404).json({ message: generateErrorMessages('STUDENT_NOT_FOUND') });
+        }
+        res.status(200).json({
+            student: { id: student._id, userId: student.userId, firstName: student.firstName, lastName: student.lastName, enrollmentNumber: student.enrollmentNumber, courses: student.courses,  dateOfBirth: student.dateOfBirth }
+        });
+    } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).json({ message: generateErrorMessages('INTERNAL_ERROR') });
+    }
+};
+
