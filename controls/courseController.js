@@ -38,3 +38,31 @@ exports.createCourse = async (req, res) => {
         res.status(500).json({ message: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
+
+// Get course details (accessible by any user)
+exports.getCourse = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Find the course by ID
+        const course = await Course.findById(id).populate('professors').populate('students');
+        if (!course) {
+            return res.status(404).json({ message: generateErrorMessages('COURSE_NOT_FOUND') });
+        }
+
+        // Return the course details with only IDs for professors and students
+        return res.status(200).json({
+            message: 'Course retrieved successfully',
+            course: {
+                id: course._id,
+                title: course.title,
+                department: course.department,
+                professors: course.professors.map(professor => professor._id),
+                students: course.students.map(student => student._id)
+            }
+        });
+    } catch (error) {
+        console.error('Error retrieving course:', error.message);
+        res.status(500).json({ message: generateErrorMessages('INTERNAL_ERROR') });
+    }
+};
