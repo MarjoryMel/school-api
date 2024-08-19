@@ -8,6 +8,7 @@ const mongoose = require("mongoose");
 const userRoutes = require("./routes/userRoutes");
 const professorRoutes = require("./routes/professorRoutes");
 const studentRoutes = require("./routes/studentRoutes");
+const courseRoutes = require("./routes/courseRoutes");
 
 // Import the function to initialize the default admin
 const initializeAdmin = require('./utils/initializeAdmin'); 
@@ -32,6 +33,7 @@ mongoose.connect(process.env.MONGO_URI)
 app.use('/api/users', userRoutes);
 app.use('/api/professor', professorRoutes);
 app.use('/api/student', studentRoutes);
+app.use('/api/course', courseRoutes);
 
 app.use((err, req, res, next) => {
     console.error(err.stack);

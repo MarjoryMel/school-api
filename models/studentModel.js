@@ -23,7 +23,8 @@ const studentSchema = new Schema({
         unique: true 
     },
     courses: [{
-        type: String, 
+        type: Schema.Types.ObjectId,
+        ref: 'Course' 
     }],
     dateOfBirth: {
         type: Date,

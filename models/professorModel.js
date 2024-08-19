@@ -17,12 +17,9 @@ const professorSchema = new Schema({
         type: String,
         required: true,
     },
-    department: {
-        type: String,
-        required: true,
-    },
     courses: [{
-        type: String, 
+        type: Schema.Types.ObjectId,
+        ref: 'Course' 
     }],
     officeLocation: {
         type: String,

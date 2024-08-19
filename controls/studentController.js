@@ -1,4 +1,5 @@
 const { generateEnrollmentNumber } = require('../utils/support');
+const { studentValidator } = require('../validators/studentValidator');
 const Student = require('../models/studentModel');
 
 // Function to create a new student (only admins can)
@@ -10,9 +11,10 @@ exports.createStudent = async (req, res) => {
 
     const { userId, firstName, lastName, courses, dateOfBirth } = req.body;
 
-    // Check if all required fields are provided
-    if (!userId || !firstName || !lastName) {
-        return res.status(400).json({ message: 'All required fields must be provided.' });
+    // Validate the request body
+    const { error } = studentValidator.validate({ userId, firstName, lastName, courses, dateOfBirth });
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
     }
 
     try {
@@ -24,7 +26,7 @@ exports.createStudent = async (req, res) => {
             userId,
             firstName,
             lastName,
-            enrollmentNumber,
+            enrollmentNumber, 
             courses,
             dateOfBirth
         });
@@ -32,6 +34,7 @@ exports.createStudent = async (req, res) => {
         // Save the student to the database
         await newStudent.save();
 
+        // Respond with the newly created student data
         res.status(201).json({
             message: 'Student created successfully',
             student: {

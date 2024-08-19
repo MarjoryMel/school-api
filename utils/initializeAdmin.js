@@ -13,7 +13,6 @@ const initializeAdmin = async () => {
             password: 'adminpassword',
             isAdmin: true
         });
-        // Save the new admin user to the database
         await adminUser.save(); 
         console.log('Admin user created'); 
     } else {
