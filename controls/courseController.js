@@ -135,8 +135,26 @@ exports.deleteCourse = async (req, res) => {
 // List all courses (accessible by any user)
 exports.listCourses = async (req, res) => {
     try {
-        // Find all courses and populate the professors and students fields
+        // Get pagination parameters from query
+        const limit = parseInt(req.query.limit, 10);
+        const page = parseInt(req.query.page, 10);
+
+        // Validate limit and page
+        const validLimits = [5, 10, 30];
+        if (!validLimits.includes(limit)) {
+            return res.status(400).json({ error: generateErrorMessages('INVALID_PAGE_LIMITE') });
+        }
+        if (page < 1 || isNaN(page)) {
+            return res.status(400).json({ error: generateErrorMessages('INVALID_PAGE_PARAMETER') });
+        }
+
+        // Calculate the number of items to skip
+        const skip = (page - 1) * limit;
+
+        // Find courses with pagination and populate the professors and students fields
         const courses = await Course.find()
+            .skip(skip)
+            .limit(limit)
             .populate({
                 path: 'professors',
                 select: 'firstName lastName'
@@ -146,14 +164,27 @@ exports.listCourses = async (req, res) => {
                 select: 'firstName lastName'
             });
 
+
+        // Get total count for pagination information
+        const totalCourses = await Course.countDocuments();
+        const totalPages = Math.ceil(totalCourses / limit);
+        
+        // Check if the requested page is valid
+        if (page > totalPages) {
+            return res.status(404).json({ error: generateErrorMessages('PAGE_NOT_FOUND') });
+        }
+
         // Check if any courses are found
         if (courses.length === 0) {
-            return res.status(404).json({ message: generateErrorMessages('COURSE_NOT_REGISTRATION') });
+            return res.status(404).json({ error: generateErrorMessages('COURSE_NOT_REGISTRATION') });
         }
 
         // Return the list of courses with populated professor and student names
         return res.status(200).json({
             message: 'Courses retrieved successfully',
+            totalCourses,
+            totalPages: Math.ceil(totalCourses / limit),
+            currentPage: page,
             courses: courses.map(course => ({
                 id: course._id,
                 title: course.title,
@@ -168,8 +199,7 @@ exports.listCourses = async (req, res) => {
             }))
         });
     } catch (error) {
-        console.error('Error:', error.message);
-        res.status(500).json({ message: generateErrorMessages('INTERNAL_ERROR') });
+        console.error('Error retrieving courses:', error.message);
+        res.status(500).json({ message: `Error retrieving courses: ${error.message}` });
     }
 };
-

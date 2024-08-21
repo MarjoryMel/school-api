@@ -19,6 +19,7 @@ const generateMessages = (field, options = {}) => {
 const generateErrorMessages = (type, details = {}) => {
     const messages = {
         'ACCESS_DENIED': 'Access denied. Admins only.',
+        'USER_NOT_REGISTRATION': 'There is no user registered in the system',
         'USER_NOT_FOUND': 'User not found.',
         'USER_CANNOT_UPDATE': 'Users can only update their own data.',
         'USER_ALREADY_EXISTS': 'User with this email or username already exists.',
@@ -33,7 +34,10 @@ const generateErrorMessages = (type, details = {}) => {
         'STUDENT_NOT_FOUND': 'Student not found.',
         'STUDENT_NOT_REGISTRATION': 'There is no student registered in the system',
         'COURSE_NOT_FOUND': 'Course not found.',
-        'COURSE_NOT_REGISTRATION': 'There is no course registered in the system'
+        'COURSE_NOT_REGISTRATION': 'There is no course registered in the system',
+        'INVALID_PAGE_LIMITE': 'Invalid limit parameter. Allowed values are 5, 10, 30.',
+        'INVALID_PAGE_PARAMETER': 'Invalid page parameter. Page must be a positive integer.',
+        'PAGE_NOT_FOUND': 'No records found for the requested page. Ensure that the page number is within the valid range.'
     };
 
     return messages[type] || 'Unknown error.';

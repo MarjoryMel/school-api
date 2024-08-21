@@ -196,3 +196,65 @@ exports.updateUser = async (req, res) => {
         res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
+
+// List all users (accessible by admins only)
+exports.listUsers = async (req, res) => {
+    try {
+        // Check if the authenticated user is an admin
+        if (!req.user.isAdmin) {
+            return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
+        }
+
+        // Get pagination parameters from query
+        const limit = parseInt(req.query.limit, 10);
+        const page = parseInt(req.query.page, 10);
+
+        // Validate limit and page
+        const validLimits = [5, 10, 30];
+        if (!validLimits.includes(limit)) {
+            return res.status(400).json({ error: generateErrorMessages('INVALID_PAGE_LIMITE') });
+        }
+        if (page < 1 || isNaN(page)) {
+            return res.status(400).json({ error: generateErrorMessages('INVALID_PAGE_PARAMETER') });
+        }
+
+        // Calculate the number of items to skip
+        const skip = (page - 1) * limit;
+
+        // Find users with pagination
+        const users = await User.find()
+            .skip(skip)
+            .limit(limit);
+
+        // Get total count for pagination information
+        const totalUsers = await User.countDocuments();
+        const totalPages = Math.ceil(totalUsers / limit);
+
+        // Check if the requested page is valid
+        if (page > totalPages) {
+            return res.status(404).json({ error: generateErrorMessages('PAGE_NOT_FOUND') });
+        }
+
+        // Check if any users are found
+        if (users.length === 0) {
+            return res.status(404).json({ error: generateErrorMessages('USER_NOT_REGISTRATION') });
+        }
+
+        // Return the list of users
+        return res.status(200).json({
+            message: 'Users retrieved successfully',
+            totalUsers,
+            totalPages: Math.ceil(totalUsers / limit),
+            currentPage: page,
+            users: users.map(user => ({
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                isAdmin: user.isAdmin
+            }))
+        });
+    } catch (error) {
+        console.error('Error retrieving users:', error.message);
+        res.status(500).json({ message: 'Internal server error.' });
+    }
+};

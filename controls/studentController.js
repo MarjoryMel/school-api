@@ -167,11 +167,38 @@ exports.deleteStudent = async (req, res) => {
 // List all students (accessible by any user)
 exports.listStudents = async (req, res) => {
     try {
-        // Find all students and populate the courses field with the course names and IDs
+        // Retrieve pagination parameters from query
+        const limit = parseInt(req.query.limit, 10);
+        const page = parseInt(req.query.page, 10);
+        
+        // Validate limit and page
+        const validLimits = [5, 10, 30];
+        if (!validLimits.includes(limit)) {
+            return res.status(400).json({ error: generateErrorMessages('INVALID_PAGE_LIMITE') });
+        }
+        if (page < 1 || isNaN(page)) {
+            return res.status(400).json({ error: generateErrorMessages('INVALID_PAGE_PARAMETER') });
+        }
+
+        // Calculate the number of items to skip
+        const skip = (page - 1) * limit;
+
+        // Get total count for pagination information
+        const totalStudents = await Student.countDocuments();
+        const totalPages = Math.ceil(totalStudents / limit);
+
+        // Check if the requested page is valid
+        if (page > totalPages) {
+            return res.status(404).json({ error: generateErrorMessages('PAGE_NOT_FOUND') });
+        }
+
+        // Find students with pagination and populate the courses field
         const students = await Student.find()
+            .skip(skip)
+            .limit(limit)
             .populate({
                 path: 'courses',
-                select: 'title' 
+                select: 'title'
             });
 
         // Check if any students are found
@@ -179,9 +206,12 @@ exports.listStudents = async (req, res) => {
             return res.status(404).json({ message: generateErrorMessages('STUDENT_NOT_REGISTRATION') });
         }
 
-        // Return the list of students
+        // Return the list of students with pagination info
         return res.status(200).json({
             message: 'Students retrieved successfully',
+            totalStudents,
+            totalPages,
+            currentPage: page,
             students: students.map(student => ({
                 id: student._id,
                 userId: student.userId,
@@ -200,5 +230,6 @@ exports.listStudents = async (req, res) => {
         res.status(500).json({ message: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
+
 
 

@@ -174,21 +174,52 @@ exports.deleteProfessor = async (req, res) => {
 // List all professors (accessible by any user)
 exports.listProfessors = async (req, res) => {
     try {
-        // Retrieve all professors and populate the courses field with the course names and IDs
+        // Get pagination parameters from query
+        const limit = parseInt(req.query.limit, 10);
+        const page = parseInt(req.query.page, 10);
+
+        // Validate limit and page
+        const validLimits = [5, 10, 30];
+        if (!validLimits.includes(limit)) {
+            return res.status(400).json({ error: generateErrorMessages('INVALID_PAGE_LIMITE') });
+        }
+        if (page < 1 || isNaN(page)) {
+            return res.status(400).json({ error: generateErrorMessages('INVALID_PAGE_PARAMETER') });
+        }
+
+        // Calculate the number of items to skip
+        const skip = (page - 1) * limit;
+
+        // Find professors with pagination and populate the courses field
         const professors = await Professor.find()
+            .skip(skip)
+            .limit(limit)
             .populate({
                 path: 'courses',
                 select: 'title'
             });
 
-        // Check if there are no professors
+
+        // Get total count for pagination information
+        const totalProfessors = await Professor.countDocuments();
+        const totalPages = Math.ceil(totalProfessors / limit);
+
+        // Check if the requested page is valid
+        if (page > totalPages) {
+            return res.status(404).json({ error: generateErrorMessages('PAGE_NOT_FOUND') });
+        }
+
+        // Check if any professors are found
         if (professors.length === 0) {
-            return res.status(404).json({ message: generateErrorMessages('PROFESSOR_NOT_REGISTRATION') });
+            return res.status(404).json({ error: generateErrorMessages('PROFESSOR_NOT_REGISTRATION') });
         }
 
         // Respond with the list of professors
         return res.status(200).json({
             message: 'Professors retrieved successfully',
+            totalProfessors,
+            totalPages: Math.ceil(totalProfessors / limit),
+            currentPage: page,
             professors: professors.map(professor => ({
                 id: professor._id,
                 userId: professor.userId,
@@ -202,7 +233,7 @@ exports.listProfessors = async (req, res) => {
             }))
         });
     } catch (error) {
-        console.error('Error:', error.message);
-        res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
+        console.error('Error retrieving professors:', error.message);
+        res.status(500).json({ message: `Error retrieving professors: ${error.message}` });
     }
 };
