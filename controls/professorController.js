@@ -6,7 +6,7 @@ const { generateErrorMessages } = require('../utils/errorMessages');
 
 // Create a new professor (only admins can)
 exports.createProfessor = async (req, res) => {
-    // Check if the authenticated user is an admin
+
     if (!req.user.isAdmin) {
         return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
     }
@@ -174,18 +174,32 @@ exports.deleteProfessor = async (req, res) => {
 // List all professors (accessible by any user)
 exports.listProfessors = async (req, res) => {
     try {
-        // Retrieve all professors from the database
-        const professors = await Professor.find();
-        
+        // Retrieve all professors and populate the courses field with the course names and IDs
+        const professors = await Professor.find()
+            .populate({
+                path: 'courses',
+                select: 'title'
+            });
+
         // Check if there are no professors
         if (professors.length === 0) {
-            return res.status(404).json({ message: generateErrorMessages('NO_PROFESSORS_FOUND') });
+            return res.status(404).json({ message: generateErrorMessages('PROFESSOR_NOT_REGISTRATION') });
         }
 
         // Respond with the list of professors
         return res.status(200).json({
             message: 'Professors retrieved successfully',
-            professors: professors.map(professor => ({ id: professor._id,userId: professor.userId,firstName: professor.firstName,lastName: professor.lastName,courses: professor.courses, officeLocation: professor.officeLocation }))
+            professors: professors.map(professor => ({
+                id: professor._id,
+                userId: professor.userId,
+                firstName: professor.firstName,
+                lastName: professor.lastName,
+                courses: professor.courses.map(course => ({
+                    id: course._id,
+                    title: course.title
+                })),
+                officeLocation: professor.officeLocation
+            }))
         });
     } catch (error) {
         console.error('Error:', error.message);

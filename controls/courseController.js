@@ -135,21 +135,41 @@ exports.deleteCourse = async (req, res) => {
 // List all courses (accessible by any user)
 exports.listCourses = async (req, res) => {
     try {
-        // Find all courses
-        const courses = await Course.find();
+        // Find all courses and populate the professors and students fields
+        const courses = await Course.find()
+            .populate({
+                path: 'professors',
+                select: 'firstName lastName'
+            })
+            .populate({
+                path: 'students',
+                select: 'firstName lastName'
+            });
 
         // Check if any courses are found
         if (courses.length === 0) {
-            return res.status(404).json({ message: generateErrorMessages('NO_COURSES_FOUND') });
+            return res.status(404).json({ message: generateErrorMessages('COURSE_NOT_REGISTRATION') });
         }
 
-        // Return the list of courses
+        // Return the list of courses with populated professor and student names
         return res.status(200).json({
             message: 'Courses retrieved successfully',
-            courses: courses.map(course => ({ id: course._id, title: course.title, students: course.students, professors: course.professors }))
+            courses: courses.map(course => ({
+                id: course._id,
+                title: course.title,
+                students: course.students.map(student => ({
+                    id: student._id,
+                    name: `${student.firstName} ${student.lastName}`
+                })),
+                professors: course.professors.map(professor => ({
+                    id: professor._id,
+                    name: `${professor.firstName} ${professor.lastName}`
+                }))
+            }))
         });
     } catch (error) {
         console.error('Error:', error.message);
         res.status(500).json({ message: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
+

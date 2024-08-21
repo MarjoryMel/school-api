@@ -1,4 +1,4 @@
-
+// Generate messages when sending requests
 const generateMessages = (field, options = {}) => {
     return {
         'string.base': `The ${field} field must be a string.`,
@@ -15,6 +15,7 @@ const generateMessages = (field, options = {}) => {
     };
 };
 
+// Displays error messages after sending requests
 const generateErrorMessages = (type, details = {}) => {
     const messages = {
         'ACCESS_DENIED': 'Access denied. Admins only.',
@@ -25,12 +26,14 @@ const generateErrorMessages = (type, details = {}) => {
         'CANNOT_DELETE_ADMIN': 'Admin users cannot be deleted by other admins.',
         'PROFESSOR_ALREADY_EXISTS': 'User is already a professor.',
         'PROFESSOR_NOT_FOUND': 'Professor not found.',
-        'NO_PROFESSORS_FOUND': 'No professors found.',
+        'PROFESSOR_NOT_REGISTRATION': 'There is no professor registered in the system',
         'VALIDATION_ERROR': 'Validation error occurred.',
         'INTERNAL_ERROR': 'An internal error occurred.',
         'COURSE_ALREADY_EXISTS': 'A course with this title already exists.',
         'STUDENT_NOT_FOUND': 'Student not found.',
-        'COURSE_NOT_FOUND': 'Course not found.'
+        'STUDENT_NOT_REGISTRATION': 'There is no student registered in the system',
+        'COURSE_NOT_FOUND': 'Course not found.',
+        'COURSE_NOT_REGISTRATION': 'There is no course registered in the system'
     };
 
     return messages[type] || 'Unknown error.';
