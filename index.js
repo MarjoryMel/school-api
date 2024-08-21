@@ -9,9 +9,7 @@ const userRoutes = require("./routes/userRoutes");
 const professorRoutes = require("./routes/professorRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 const courseRoutes = require("./routes/courseRoutes");
-
-// Import the function to initialize the default admin
-const initializeAdmin = require('./utils/initializeAdmin'); 
+const installRoutes = require("./routes/installRoutes");
 
 const app = express();
 
@@ -25,7 +23,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 mongoose.connect(process.env.MONGO_URI)
     .then(() => {
         console.log("MongoDB connected");
-        return initializeAdmin(); 
     })
     .catch(err => console.error("MongoDB connection error:", err));
 
@@ -34,6 +31,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/professor', professorRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/course', courseRoutes);
+app.use('/api/install', installRoutes);
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
