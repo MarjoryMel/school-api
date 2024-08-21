@@ -11,10 +11,10 @@ exports.createStudent = async (req, res) => {
         return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
     }
 
-    const { userId, firstName, lastName, courses, dateOfBirth } = req.body;
+    const { userId, firstName, lastName, courses } = req.body;
 
     // Validate the request body
-    const { error } = studentCreationValidator.validate({ userId, firstName, lastName, courses, dateOfBirth });
+    const { error } = studentCreationValidator.validate({ userId, firstName, lastName, courses });
     if (error) {
         return res.status(400).json({ message: generateErrorMessages('VALIDATION_ERROR') });
     }
@@ -24,7 +24,7 @@ exports.createStudent = async (req, res) => {
         const enrollmentNumber = generateEnrollmentNumber();
 
         // Create a new student
-        const newStudent = new Student({ userId, firstName, lastName, enrollmentNumber, courses, dateOfBirth });
+        const newStudent = new Student({ userId, firstName, lastName, enrollmentNumber, courses });
         await newStudent.save();
 
         // Add the new student to the specified courses
@@ -42,7 +42,7 @@ exports.createStudent = async (req, res) => {
 
         res.status(201).json({
             message: 'Student created successfully',
-            student: { id: newStudent._id, userId: newStudent.userId, firstName: newStudent.firstName, lastName: newStudent.lastName, enrollmentNumber: newStudent.enrollmentNumber,  courses: newStudent.courses,  dateOfBirth: newStudent.dateOfBirth }
+            student: { id: newStudent._id, userId: newStudent.userId, firstName: newStudent.firstName, lastName: newStudent.lastName, enrollmentNumber: newStudent.enrollmentNumber,  courses: newStudent.courses }
         });
     } catch (error) {
         console.error('Error:', error.message);
@@ -61,7 +61,7 @@ exports.getStudent = async (req, res) => {
             return res.status(404).json({ message: generateErrorMessages('STUDENT_NOT_FOUND') });
         }
         res.status(200).json({
-            student: { id: student._id, userId: student.userId, firstName: student.firstName, lastName: student.lastName, enrollmentNumber: student.enrollmentNumber, courses: student.courses,  dateOfBirth: student.dateOfBirth }
+            student: { id: student._id, userId: student.userId, firstName: student.firstName, lastName: student.lastName, enrollmentNumber: student.enrollmentNumber, courses: student.courses }
         });
     } catch (error) {
         console.error('Error:', error.message);
@@ -125,7 +125,7 @@ exports.updateStudent = async (req, res) => {
             await student.save();
             return res.status(200).json({
                 message: 'Student updated successfully',
-                student: { id: student._id, userId: student.userId, firstName: student.firstName, lastName: student.lastName, enrollmentNumber: student.enrollmentNumber, courses: student.courses, dateOfBirth: student.dateOfBirth }
+                student: { id: student._id, userId: student.userId, firstName: student.firstName, lastName: student.lastName, enrollmentNumber: student.enrollmentNumber, courses: student.courses }
             });
         } else {
             return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
@@ -156,7 +156,7 @@ exports.deleteStudent = async (req, res) => {
         console.log('Student deleted successfully:', student);
         return res.status(200).json({
             message: 'Student deleted successfully',
-            student: { id: student._id, userId: student.userId, firstName: student.firstName, lastName: student.lastName, enrollmentNumber: student.enrollmentNumber,courses: student.courses, dateOfBirth: student.dateOfBirth }
+            student: { id: student._id, userId: student.userId, firstName: student.firstName, lastName: student.lastName, enrollmentNumber: student.enrollmentNumber,courses: student.courses }
         });
     } catch (error) {
         console.error('Error:', error.message);
@@ -222,7 +222,6 @@ exports.listStudents = async (req, res) => {
                     id: course._id,
                     title: course.title
                 })),
-                dateOfBirth: student.dateOfBirth
             }))
         });
     } catch (error) {

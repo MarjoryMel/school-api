@@ -10,8 +10,6 @@ const generateMessages = (field, options = {}) => {
         'array.base': `The ${field} field must be a list.`,
         'string.pattern.base': `Each item in ${field} must be a valid ID (24 hexadecimal characters).`,
         'string.email': `The ${field} field must be a valid email address.`,
-        'string.regex.base': `The ${field} field must be in the format YYYY-MM-DD.`,
-        'custom': `The ${field} field must be a valid date in the format YYYY-MM-DD.`
     };
 };
 
@@ -37,7 +35,8 @@ const generateErrorMessages = (type, details = {}) => {
         'COURSE_NOT_REGISTRATION': 'There is no course registered in the system',
         'INVALID_PAGE_LIMITE': 'Invalid limit parameter. Allowed values are 5, 10, 30.',
         'INVALID_PAGE_PARAMETER': 'Invalid page parameter. Page must be a positive integer.',
-        'PAGE_NOT_FOUND': 'No records found for the requested page. Ensure that the page number is within the valid range.'
+        'PAGE_NOT_FOUND': 'No records found for the requested page. Ensure that the page number is within the valid range.',
+        'INVALID_CAPACITY': 'Capacity must be a positive integer greater than 0.'
     };
 
     return messages[type] || 'Unknown error.';

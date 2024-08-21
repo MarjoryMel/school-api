@@ -8,5 +8,6 @@ router.get('/:id', CourseController.getCourse);                        // Route 
 router.put('/:id', authMiddleware, CourseController.updateCourse);     // Route to update a course
 router.delete('/:id', authMiddleware, CourseController.deleteCourse);  // Route to delete a course
 router.get('/', CourseController.listCourses);                         // Route to list courses
+router.get('/summary/info-course', CourseController.getCourseSummary);      //
 
 module.exports = router;

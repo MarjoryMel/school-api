@@ -25,11 +25,7 @@ const studentSchema = new Schema({
     courses: [{
         type: Schema.Types.ObjectId,
         ref: 'Course' 
-    }],
-    dateOfBirth: {
-        type: Date,
-        required: true
-    }
+    }]
 }, {
     timestamps: true
 });

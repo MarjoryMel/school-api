@@ -8,6 +8,10 @@ const courseSchema = new Schema({
         required: true,
         unique: true,
     },
+    capacity: {
+        type: Number,
+        required: true
+    },
     department: {
         type: String,
         required: true,

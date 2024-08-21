@@ -40,11 +40,11 @@ const installDatabase = async (req, res) => {
 
         // Create Courses
         const courses = await Course.insertMany([
-            { title: 'Mathematics', department: 'Science' },
-            { title: 'Physics', department: 'Science' },
-            { title: 'Chemistry', department: 'Science' },
-            { title: 'Biology', department: 'Science' },
-            { title: 'Computer Science', department: 'Engineering' }
+            { title: 'Mathematics', department: 'Science', capacity: 30 },
+            { title: 'Physics', department: 'Science', capacity: 25 },
+            { title: 'Chemistry', department: 'Science', capacity: 20 },
+            { title: 'Biology', department: 'Science', capacity: 35 },
+            { title: 'Computer Science', department: 'Engineering', capacity: 40 }
         ]);
 
         // Create Professors
@@ -58,11 +58,11 @@ const installDatabase = async (req, res) => {
 
         // Create Students
         const students = await Student.insertMany([
-            { userId: users[6]._id, firstName: 'Mike', lastName: 'Taylor', enrollmentNumber: generateEnrollmentNumber(), courses: [courses[0]._id, courses[1]._id], dateOfBirth: new Date('2000-01-01') },
-            { userId: users[7]._id, firstName: 'Emma', lastName: 'Wilson', enrollmentNumber: generateEnrollmentNumber(), courses: [courses[2]._id, courses[3]._id], dateOfBirth: new Date('1999-02-02') },
-            { userId: users[8]._id, firstName: 'Oliver', lastName: 'Anderson', enrollmentNumber: generateEnrollmentNumber(), courses: [courses[4]._id], dateOfBirth: new Date('1998-03-03') },
-            { userId: users[9]._id, firstName: 'Sophia', lastName: 'Moore', enrollmentNumber: generateEnrollmentNumber(), courses: [courses[0]._id], dateOfBirth: new Date('2001-04-04') },
-            { userId: users[10]._id, firstName: 'Liam', lastName: 'Jackson', enrollmentNumber: generateEnrollmentNumber(), courses: [courses[1]._id, courses[2]._id], dateOfBirth: new Date('2000-05-05') }
+            { userId: users[6]._id, firstName: 'Mike', lastName: 'Taylor', enrollmentNumber: generateEnrollmentNumber(), courses: [courses[0]._id, courses[1]._id] },
+            { userId: users[7]._id, firstName: 'Emma', lastName: 'Wilson', enrollmentNumber: generateEnrollmentNumber(), courses: [courses[2]._id, courses[3]._id] },
+            { userId: users[8]._id, firstName: 'Oliver', lastName: 'Anderson', enrollmentNumber: generateEnrollmentNumber(), courses: [courses[4]._id] },
+            { userId: users[9]._id, firstName: 'Sophia', lastName: 'Moore', enrollmentNumber: generateEnrollmentNumber(), courses: [courses[0]._id] },
+            { userId: users[10]._id, firstName: 'Liam', lastName: 'Jackson', enrollmentNumber: generateEnrollmentNumber(), courses: [courses[1]._id] }
         ]);
 
         // Update Courses with Professors and Students

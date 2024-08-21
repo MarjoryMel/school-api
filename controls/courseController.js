@@ -6,10 +6,10 @@ const { generateErrorMessages } = require('../utils/errorMessages');
 
 // Create a new course (only admins can)
 exports.createCourse = async (req, res) => {
-    const { title, department, professors, students } = req.body;
+    const { title, department, professors, students, capacity } = req.body;
 
     // Validate the course data
-    const { error } = courseCreationValidator.validate({ title, department, professors, students });
+    const { error } = courseCreationValidator.validate({ title, department, professors, students, capacity });
     if (error) {
         return res.status(400).json({ message: generateErrorMessages('VALIDATION_ERROR') });
     }
@@ -27,18 +27,19 @@ exports.createCourse = async (req, res) => {
         }
 
         // Create a new course
-        const newCourse = new Course({ title, department, professors, students });
+        const newCourse = new Course({ title, department, professors, students, capacity });
         await newCourse.save();
         console.log('Course created successfully:', newCourse);
         res.status(201).json({
             message: 'Course created successfully',
-            course: { id: newCourse._id, title: newCourse.title, department: newCourse.department, professors: newCourse.professors, students: newCourse.students }
+            course: { id: newCourse._id, title: newCourse.title, department: newCourse.department, professors: newCourse.professors, students: newCourse.students, capacity: newCourse.capacity }
         });
     } catch (error) {
         console.error('Error creating course:', error.message);
         res.status(500).json({ message: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
+
 
 // Get course details (accessible by any user)
 exports.getCourse = async (req, res) => {
@@ -94,7 +95,7 @@ exports.updateCourse = async (req, res) => {
         // Return the updated course details
         return res.status(200).json({
             message: 'Course updated successfully',
-            course: { id: course._id, title: course.title, department: course.department, professors: course.professors, students: course.students }
+            course: { id: course._id, title: course.title, department: course.department, professors: course.professors, students: course.students, capacity: course.capacity }
         });
     } catch (error) {
         console.error('Error updating course:', error.message);
@@ -188,6 +189,7 @@ exports.listCourses = async (req, res) => {
             courses: courses.map(course => ({
                 id: course._id,
                 title: course.title,
+                capacity: course.capacity,
                 students: course.students.map(student => ({
                     id: student._id,
                     name: `${student.firstName} ${student.lastName}`
@@ -201,5 +203,75 @@ exports.listCourses = async (req, res) => {
     } catch (error) {
         console.error('Error retrieving courses:', error.message);
         res.status(500).json({ message: `Error retrieving courses: ${error.message}` });
+    }
+};
+
+// Get a summary of students distribution and average course capacity
+exports.getCourseSummary = async (req, res) => {
+    try {
+        // Retrieve total number of students in each course with capacity
+        const studentsPerCourse = await Course.aggregate([
+            {
+                $lookup: {
+                    from: 'students',
+                    localField: 'students',
+                    foreignField: '_id',
+                    as: 'studentsList'
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    title: 1,
+                    capacity: 1,
+                    department: 1,
+                    totalStudents: { $size: '$studentsList' }
+                }
+            }
+        ]);
+
+        // Retrieve total number of students in each department
+        const studentsPerDepartment = await Course.aggregate([
+            {
+                $lookup: {
+                    from: 'students',
+                    localField: 'students',
+                    foreignField: '_id',
+                    as: 'studentsList'
+                }
+            },
+            {
+                $group: {
+                    _id: '$department',
+                    totalStudents: { $sum: { $size: '$studentsList' } }
+                }
+            }
+        ]);
+
+        // Retrieve the average capacity of courses
+        const [averageCapacityResult] = await Course.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    averageCapacity: { $avg: '$capacity' }
+                }
+            }
+        ]);
+
+        // Construct the response object
+        const response = {
+            message: 'Course summary retrieved successfully',
+            data: {
+                studentsPerCourse,
+                studentsPerDepartment,
+                averageCapacity: averageCapacityResult ? averageCapacityResult.averageCapacity : 0
+            }
+        };
+
+        // Send the response
+        res.status(200).json(response);
+    } catch (error) {
+        console.error('Error retrieving course summary:', error.message);
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
