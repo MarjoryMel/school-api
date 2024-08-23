@@ -46,22 +46,26 @@ exports.getCourse = async (req, res) => {
     const { id } = req.params;
 
     try {
-        // Find the course by ID
-        const course = await Course.findById(id).populate('professors').populate('students');
+        // Find the course by ID and populate professor and student details
+        const course = await Course.findById(id)
+            .populate('professors', 'firstName lastName')  
+            .populate('students', 'firstName lastName');   
         if (!course) {
             return res.status(404).json({ message: generateErrorMessages('COURSE_NOT_FOUND') });
         }
 
-        // Return the course details with only IDs for professors and students
-        return res.status(200).json({
-            message: 'Course retrieved successfully',
-            course: { id: course._id, title: course.title, department: course.department, professors: course.professors.map(professor => professor._id), students: course.students.map(student => student._id)}
-        });
+        const professors = course.professors.map(professor => ({ id: professor._id, firstName: professor.firstName, lastName: professor.lastName }));
+
+        const students = course.students.map(student => ({ id: student._id, firstName: student.firstName,  lastName: student.lastName }));
+
+        // Return the course details with IDs and names for professors and students
+        return res.status(200).json({ course: { id: course._id,  title: course.title,  department: course.department, professors: professors,  students: students }  });
     } catch (error) {
         console.error('Error retrieving course:', error.message);
         res.status(500).json({ message: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
+
 
 // Update course details (only admins can)
 exports.updateCourse = async (req, res) => {

@@ -62,19 +62,25 @@ exports.getProfessor = async (req, res) => {
     const { id } = req.params;
 
     try {
-        // Find professor by ID
-        const professor = await Professor.findById(id);
+        // Find professor by ID and populate the courses field with course details
+        const professor = await Professor.findById(id).populate('courses');
         if (!professor) {
             return res.status(404).json({ message: generateErrorMessages('PROFESSOR_NOT_FOUND') });
         }
-        res.status(200).json({
-            professor: { id: professor._id, userId: professor.userId, firstName: professor.firstName, lastName: professor.lastName, courses: professor.courses, officeLocation: professor.officeLocation }
-        });
+
+        // Map the courses to include both the ID and the title
+        const courses = professor.courses.map(course => ({
+            id: course._id,
+            title: course.title
+        }));
+
+        res.status(200).json({ professor: { id: professor._id, userId: professor.userId, firstName: professor.firstName, lastName: professor.lastName, courses: courses, officeLocation: professor.officeLocation} });
     } catch (error) {
         console.error('Error:', error.message);
         res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
+
 
 // Update professor details (only admins or the professor themselves can)
 exports.updateProfessor = async (req, res) => {
