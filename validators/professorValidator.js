@@ -11,10 +11,10 @@ const professorCreationValidator = Joi.object({
 });
 
 const professorUpdateValidator = Joi.object({
-    userId: Joi.string().messages(generateMessages('userId')),
-    firstName: Joi.string().min(2).max(50).messages(generateMessages('firstName', { min: 2, max: 50 })),
-    lastName: Joi.string().min(2).max(50).messages(generateMessages('lastName', { min: 2, max: 50 })),
-    courses: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)).messages(generateMessages('courses')),
+    userId: Joi.string().optional().messages(generateMessages('userId')),
+    firstName: Joi.string().min(2).max(50).optional().messages(generateMessages('firstName', { min: 2, max: 50 })),
+    lastName: Joi.string().min(2).max(50).optional().messages(generateMessages('lastName', { min: 2, max: 50 })),
+    courses: Joi.array().items(Joi.string().optional().regex(/^[0-9a-fA-F]{24}$/)).messages(generateMessages('courses')),
     officeLocation: Joi.string().optional().allow('').messages(generateMessages('officeLocation')),
 });
 

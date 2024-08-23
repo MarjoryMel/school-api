@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const StudentController = require('../controls/studentController'); 
+const StudentController = require('../controllers/studentController'); 
 const authMiddleware = require('../utils/middlewares'); 
 
 router.post('/', authMiddleware, StudentController.createStudent);                    // Route to create a new student

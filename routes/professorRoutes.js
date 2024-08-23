@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const ProfessorController = require('../controls/professorController');
+const ProfessorController = require('../controllers/professorController');
 const authMiddleware = require('../utils/middlewares');
 
 router.post('/', authMiddleware, ProfessorController.createProfessor);       // Route to create a new teacher

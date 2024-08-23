@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const installController = require('../controls/installController');
+const installController = require('../controllers/installController');
 
 router.get('/', installController.installDatabase);    // Route to install data in the database
 

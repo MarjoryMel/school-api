@@ -16,9 +16,9 @@ const loginValidator = Joi.object({
 
 // Schema for updating user data
 const updateUserValidator = Joi.object({
-    username: Joi.string().alphanum().min(3).max(30).messages(generateMessages('username', { min: 3, max: 30 })),
-    email: Joi.string().email().messages(generateMessages('email')),
-    password: Joi.string().min(6).messages(generateMessages('password', { min: 6 }))
+    username: Joi.string().alphanum().min(3).max(30).optional().messages(generateMessages('username', { min: 3, max: 30 })),
+    email: Joi.string().email().optional().messages(generateMessages('email')),
+    password: Joi.string().min(6).optional().messages(generateMessages('password', { min: 6 }))
 });
 
 // Schema for creating a new admin
