@@ -16,6 +16,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "swagger-autogen": "node swagger.js",
     "start": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

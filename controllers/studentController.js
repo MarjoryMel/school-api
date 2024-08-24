@@ -147,7 +147,7 @@ exports.updateStudent = async (req, res) => {
 
 // Delete a student (only admins can)
 exports.deleteStudent = async (req, res) => {
-    const { id } = req.params;
+    const { enrollmentNumber } = req.params;
 
     try {
         // Check if the authenticated user is an admin
@@ -155,21 +155,23 @@ exports.deleteStudent = async (req, res) => {
             return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
         }
 
-        // Find and delete the student by ID
-        const student = await Student.findByIdAndDelete(id);
+        // Find and delete the student by enrollment number
+        const student = await Student.findOneAndDelete({ enrollmentNumber });
         if (!student) {
             return res.status(404).json({ message: generateErrorMessages('STUDENT_NOT_FOUND') });
         }
+        
         console.log('Student deleted successfully:', student);
         return res.status(200).json({
             message: 'Student deleted successfully',
-            student: { id: student._id, userId: student.userId, firstName: student.firstName, lastName: student.lastName, enrollmentNumber: student.enrollmentNumber,courses: student.courses }
+            student: { id: student._id, userId: student.userId, firstName: student.firstName, lastName: student.lastName, enrollmentNumber: student.enrollmentNumber, courses: student.courses }
         });
     } catch (error) {
         console.error('Error:', error.message);
-        res.status(500).json({ error: generateErrorMessages('INTERNAL_ERROR') });
+        res.status(500).json({ message: generateErrorMessages('INTERNAL_ERROR') });
     }
 };
+
 
 // List all students (accessible by any user)
 exports.listStudents = async (req, res) => {

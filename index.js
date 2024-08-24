@@ -10,6 +10,8 @@ const professorRoutes = require("./routes/professorRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 const courseRoutes = require("./routes/courseRoutes");
 const installRoutes = require("./routes/installRoutes");
+const swaggerUi = require('swagger-ui-express');
+const swaggerFile = require('./swagger_output.json'); 
 
 const app = express();
 
@@ -32,6 +34,7 @@ app.use('/api/professor', professorRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/course', courseRoutes);
 app.use('/api/install', installRoutes);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
