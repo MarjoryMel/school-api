@@ -1,13 +1,13 @@
 {
-  "swagger": "2.0",
+  "openapi": "3.0.0",
   "info": {
     "title": "School API",
-    "description": "",
+    "description": "API for managing school operations, including user management, professors, students, and courses.\n\n**Note**: The IDs shown in this documentation are fictitious examples. Each time the database is installed, new IDs are generated. To use the API correctly, you must use valid IDs, which can be obtained by listing the entities or directly from the database.",
     "version": "1.0.0"
   },
   "servers": [
     {
-      "url": "https://localhost:3000/api/"
+      "url": "http://localhost:3000/api/"
     }
   ],
   "tags": [
@@ -32,12 +32,20 @@
       "description": "Course-related operations"
     }
   ],
+  "components": {
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Enter your bearer token in the format **Bearer <token>**. Token is valid for 1 hour."
+      }
+    }
+  },
   "paths": {
     "/install": {
       "get": {
-        "tags": [
-          "install"
-        ],
+        "tags": ["install"],
         "summary": "Install the database",
         "description": "Initialize and install data in the database.",
         "operationId": "installDatabase",
@@ -50,7 +58,8 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Database installed successfully"
                     }
                   }
                 }
@@ -65,29 +74,29 @@
     },
     "/users": {
       "post": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Register a new user",
         "description": "Register a new user with a username, email, and password.",
         "operationId": "registerUser",
         "requestBody": {
-          "description": "User details for registration",
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
                   "username": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "newuser"
                   },
                   "email": {
                     "type": "string",
-                    "format": "email"
+                    "format": "email",
+                    "example": "newuser@example.com"
                   },
                   "password": {
                     "type": "string",
-                    "format": "password"
+                    "format": "password",
+                    "example": "password1"
                   }
                 },
                 "required": [
@@ -109,20 +118,23 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "User registered successfully"
                     },
                     "user": {
                       "type": "object",
                       "properties": {
                         "id": {
                           "type": "string",
-                          "format": "uuid"
+                          "example": "66cf2c0df4002574697e13af"
                         },
                         "username": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "newuser"
                         },
                         "email": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "newuser@example.com"
                         }
                       }
                     }
@@ -142,25 +154,24 @@
     },
     "/users/login": {
       "post": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Log in a user",
-        "description": "Log in a user and return a JWT token.",
+        "description": "Log in a user and return a JWT token.**Token is valid for 1 hour.**",
         "operationId": "loginUser",
         "requestBody": {
-          "description": "User credentials for login",
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
                   "username": {
-                    "type": "string"
+                    "type": "string",
+                    "example" : "admin"
                   },
                   "password": {
                     "type": "string",
-                    "format": "password"
+                    "format": "password",
+                    "example" : "adminpass"
                   }
                 },
                 "required": [
@@ -181,23 +192,27 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Login successful"
                     },
                     "token": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmNmMmMwZGY0MDAyNTc0Njk3ZTEzYTYiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3MjQ4NTc1NTAsImV4cCI6MTcyNDg2MTE1MH0.QgG7SWKzKMz6FHPIVJUN-UU95BYShwmobdgob1b0L-o"
                     },
                     "user": {
                       "type": "object",
                       "properties": {
                         "id": {
                           "type": "string",
-                          "format": "uuid"
+                          "example": "66cf2c0df4002574697e13af"
                         },
                         "username": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "admin"
                         },
                         "email": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "admin@example.com"
                         },
                         "isAdmin": {
                           "type": "boolean"
@@ -209,13 +224,16 @@
                           "type": "object",
                           "properties": {
                             "firstName": {
-                              "type": "string"
+                              "type": "string",
+                              "example": "User"
                             },
                             "lastName": {
-                              "type": "string"
+                              "type": "string",
+                              "example": "Admin"
                             },
                             "department": {
-                              "type": "string"
+                              "type": "string",
+                              "example": "Administration"
                             },
                             "courses": {
                               "type": "array",
@@ -224,7 +242,8 @@
                               }
                             },
                             "officeLocation": {
-                              "type": "string"
+                              "type": "string",
+                              "example": "Room 111"
                             }
                           }
                         }
@@ -246,29 +265,34 @@
     },
     "/users/admin": {
       "post": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Create a new administrator",
         "description": "Create a new admin user. Only accessible by existing admins.",
         "operationId": "createAdmin",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "requestBody": {
-          "description": "Administrator details for creation",
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
                   "username": {
-                    "type": "string"
+                    "type": "string",
+                    "example" : "newadmin"
                   },
                   "email": {
                     "type": "string",
-                    "format": "email"
+                    "format": "email",
+                    "example" : "newadmin@example.com"
                   },
                   "password": {
                     "type": "string",
-                    "format": "password"
+                    "format": "password",
+                    "example" : "adminpass"
                   }
                 },
                 "required": [
@@ -290,20 +314,23 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Admin created successfully"
                     },
                     "user": {
                       "type": "object",
                       "properties": {
                         "id": {
                           "type": "string",
-                          "format": "uuid"
+                          "example": "66cf2c0df4002574697e13af"
                         },
                         "username": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "newadmin"
                         },
                         "email": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "newadmin@example.com"
                         },
                         "isAdmin": {
                           "type": "boolean"
@@ -329,21 +356,24 @@
     },
     "/users/{id}": {
       "delete": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Delete a user",
         "description": "Delete a user by ID. Only accessible by admins.",
         "operationId": "deleteUser",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the user to delete",
+            "description": "\n\n**The ID used in this endpoint is an example.** To use this endpoint correctly, you must provide one that is present in the database.",
             "required": true,
             "schema": {
               "type": "string",
-              "format": "uuid"
+              "example" : "66ce82472f34ff599a6acb26"
             }
           }
         ],
@@ -356,7 +386,8 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "User deleted successfully"
                     }
                   }
                 }
@@ -375,41 +406,46 @@
         }
       },
       "put": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Update user data",
         "description": "Update user data. Accessible by the user themselves or by admins.",
         "operationId": "updateUser",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the user to update",
+            "description": "\n\n**The ID used in this endpoint is an example.** To use this endpoint correctly, you must provide one that is present in the database.",
             "required": true,
             "schema": {
               "type": "string",
-              "format": "uuid"
+              "example" : "66ce83406d631c28dd300feb"
             }
           }
         ],
         "requestBody": {
-          "description": "User details to update",
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
                   "username": {
-                    "type": "string"
+                    "type": "string",
+                    "example" : "userupdate"
                   },
                   "email": {
                     "type": "string",
-                    "format": "email"
+                    "format": "email",
+                    "example" : "userupdate@example.com"
                   },
                   "password": {
                     "type": "string",
-                    "format": "password"
+                    "format": "password",
+                    "example" : "password1"
                   }
                 },
                 "required": [
@@ -430,20 +466,23 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "User updated successfully"
                     },
                     "user": {
                       "type": "object",
                       "properties": {
                         "id": {
                           "type": "string",
-                          "format": "uuid"
+                          "example" : "66ce83406d631c28dd300feb"
                         },
                         "username": {
-                          "type": "string"
+                          "type": "string",
+                          "example" : "userupdate"
                         },
                         "email": {
-                          "type": "string"
+                          "type": "string",
+                          "example" : "userupdate@example.com"
                         },
                         "isAdmin": {
                           "type": "boolean"
@@ -472,12 +511,15 @@
     },
     "/users/list": {
       "get": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "List all users",
         "description": "Retrieve a list of all users. Accessible by admins only.",
         "operationId": "listUsers",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "limit",
@@ -485,11 +527,7 @@
             "description": "Number of users to return",
             "schema": {
               "type": "integer",
-              "enum": [
-                5,
-                10,
-                30
-              ]
+              "enum": [5, 10, 30]
             }
           },
           {
@@ -513,13 +551,15 @@
                     "properties": {
                       "id": {
                         "type": "string",
-                        "format": "uuid"
+                        "example": "66cf2c0df4002574697e13af"
                       },
                       "username": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "admin"
                       },
                       "email": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "admin@example.com"
                       },
                       "isAdmin": {
                         "type": "boolean"
@@ -544,14 +584,16 @@
     },
     "/professor": {
       "post": {
-        "tags": [
-          "professor"
-        ],
+        "tags": ["professor"],
         "summary": "Create a new professor",
         "description": "Create a new professor. Only accessible by admins.",
         "operationId": "createProfessor",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "requestBody": {
-          "description": "Details for creating a new professor",
           "content": {
             "application/json": {
               "schema": {
@@ -559,23 +601,26 @@
                 "properties": {
                   "userId": {
                     "type": "string",
-                    "format": "uuid"
+                    "example" : "66cf26fc858342d14a49f2b5"
                   },
                   "firstName": {
-                    "type": "string"
+                    "type": "string",
+                    "example" : "User"
                   },
                   "lastName": {
-                    "type": "string"
+                    "type": "string",
+                    "example" : "Professor"
                   },
                   "courses": {
                     "type": "array",
                     "items": {
                       "type": "string",
-                      "format": "uuid"
+                      "example" : "66cf26fc858342d14a49f2b8"
                     }
                   },
                   "officeLocation": {
-                    "type": "string"
+                    "type": "string",
+                    "example" : "Room 106"
                   }
                 },
                 "required": [
@@ -597,24 +642,27 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Professor created successfully"
                     },
                     "professor": {
                       "type": "object",
                       "properties": {
                         "id": {
                           "type": "string",
-                          "format": "uuid"
+                          "example" : "66cf2c0df4002574697e13af"
                         },
                         "userId": {
                           "type": "string",
-                          "format": "uuid"
+                          "example" : "66cf26fc858342d14a49f2b5"
                         },
                         "firstName": {
-                          "type": "string"
+                          "type": "string",
+                          "example" : "User"
                         },
                         "lastName": {
-                          "type": "string"
+                          "type": "string",
+                          "example" : "Professor"
                         },
                         "courses": {
                           "type": "array",
@@ -623,16 +671,18 @@
                             "properties": {
                               "id": {
                                 "type": "string",
-                                "format": "uuid"
+                                "example": "66cf26fc858342d14a49f2b8"
                               },
                               "title": {
-                                "type": "string"
+                                "type": "string",
+                                "example": "Mathematics"
                               }
                             }
                           }
                         },
                         "officeLocation": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "Room 106"
                         }
                       }
                     }
@@ -655,21 +705,24 @@
     },
     "/professor/{id}": {
       "get": {
-        "tags": [
-          "professor"
-        ],
+        "tags": ["professor"],
         "summary": "Get professor details",
         "description": "Retrieve a teacher's data by ID, authenticated users only.",
         "operationId": "getProfessor",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the professor to retrieve",
+            "description": "\n\n**The ID used in this endpoint is an example.** To use this endpoint correctly, you must provide one that is present in the database. In this case it is the **entity ID**, Professor.",
             "required": true,
             "schema": {
               "type": "string",
-              "format": "uuid"
+              "example": "66cf26fc858342d14a49f2be"
             }
           }
         ],
@@ -686,17 +739,19 @@
                       "properties": {
                         "id": {
                           "type": "string",
-                          "format": "uuid"
+                          "example": "66cf26fc858342d14a49f2be"
                         },
                         "userId": {
                           "type": "string",
-                          "format": "uuid"
+                          "example": "66cf2c0df4002574697e13a7"
                         },
                         "firstName": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "John"
                         },
                         "lastName": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "Doe"
                         },
                         "courses": {
                           "type": "array",
@@ -705,10 +760,11 @@
                             "properties": {
                               "id": {
                                 "type": "string",
-                                "format": "uuid"
+                                "example": "66cf26fc858342d14a49f2be"
                               },
                               "title": {
-                                "type": "string"
+                                "type": "string",
+                                "example": "66cf26fc858342d14a49f2be"
                               }
                             }
                           }
@@ -732,46 +788,51 @@
         }
       },
       "put": {
-        "tags": [
-          "professor"
-        ],
+        "tags": ["professor"],
         "summary": "Update professor details",
         "description": "Update a professor's details. Accessible by admins or the professor themselves.",
         "operationId": "updateProfessor",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the professor to update",
+            "description": "\n\n**The ID used in this endpoint is an example.** To use this endpoint correctly, you must provide one that is present in the database. In this case it is the **entity ID**, Professor.",
             "required": true,
             "schema": {
               "type": "string",
-              "format": "uuid"
+              "example": "66cf26fc858342d14a49f2bf"
             }
           }
         ],
         "requestBody": {
-          "description": "Details to update the professor",
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
                   "firstName": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Jane"
                   },
                   "lastName": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Smith"
                   },
                   "courses": {
                     "type": "array",
                     "items": {
-                      "type": "string",
-                      "format": "uuid"
-                    }
+                      "type": "string"
+                    },
+                    "example": ["66cf26fc858342d14a49f2ba"]
                   },
                   "officeLocation": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Room 110"
                   }
                 }
               }
@@ -787,24 +848,27 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Professor updated successfully"
                     },
                     "professor": {
                       "type": "object",
                       "properties": {
                         "id": {
                           "type": "string",
-                          "format": "uuid"
+                          "example": "66cf26fc858342d14a49f2bf"
                         },
                         "userId": {
                           "type": "string",
-                          "format": "uuid"
+                          "example": "66cf2c0df4002574697e13bd"
                         },
                         "firstName": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "Jane"
                         },
                         "lastName": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "Smith"
                         },
                         "courses": {
                           "type": "array",
@@ -813,16 +877,18 @@
                             "properties": {
                               "id": {
                                 "type": "string",
-                                "format": "uuid"
+                                "example": "66cf26fc858342d14a49f2ba"
                               },
                               "title": {
-                                "type": "string"
+                                "type": "string",
+                                "example": "Mathematics"
                               }
                             }
                           }
                         },
                         "officeLocation": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "Room 110"
                         }
                       }
                     }
@@ -846,21 +912,24 @@
         }
       },
       "delete": {
-        "tags": [
-          "professor"
-        ],
+        "tags": ["professor"],
         "summary": "Delete a professor",
         "description": "Delete a professor by ID. Only accessible by admins.",
         "operationId": "deleteProfessor",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the professor to delete",
+            "description": "\n\n**The ID used in this endpoint is an example.** To use this endpoint correctly, you must provide one that is present in the database. In this case it is the **entity ID**, Professor.",
             "required": true,
             "schema": {
               "type": "string",
-              "format": "uuid"
+              "example": "66cf2c0df4002574697e13b9"
             }
           }
         ],
@@ -873,34 +942,38 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Professor deleted successfully"
                     },
                     "professor": {
                       "type": "object",
                       "properties": {
                         "id": {
                           "type": "string",
-                          "format": "uuid"
+                          "example": "66cf2c0df4002574697e13b9"
                         },
                         "userId": {
                           "type": "string",
-                          "format": "uuid"
+                          "example": "6cf2c0df4002574697e13c3"
                         },
                         "firstName": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "John"
                         },
                         "lastName": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "Doe"
                         },
                         "courses": {
                           "type": "array",
                           "items": {
                             "type": "string",
-                            "format": "uuid"
+                            "example": "66cf2c0df4002574697e13b7"
                           }
                         },
                         "officeLocation": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "Room 105"
                         }
                       }
                     }
@@ -923,9 +996,7 @@
     },
     "/professor/list": {
       "get": {
-        "tags": [
-          "professor"
-        ],
+        "tags": ["professor"],
         "summary": "List all professors",
         "description": "Retrieve a list of all professors with pagination.",
         "operationId": "listProfessors",
@@ -933,14 +1004,10 @@
           {
             "name": "limit",
             "in": "query",
-            "description": "Number of professors to return per page",
+            "description": "Number of users to return",
             "schema": {
               "type": "integer",
-              "enum": [
-                5,
-                10,
-                30
-              ]
+              "enum": [5, 10, 30]
             }
           },
           {
@@ -961,16 +1028,20 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Professors listed successfully"
                     },
                     "totalProfessors": {
-                      "type": "integer"
+                      "type": "integer",
+                      "example": "5"
                     },
                     "totalPages": {
-                      "type": "integer"
+                      "type": "integer",
+                      "example": "1"
                     },
                     "currentPage": {
-                      "type": "integer"
+                      "type": "integer",
+                      "example": "1"
                     },
                     "professors": {
                       "type": "array",
@@ -979,17 +1050,19 @@
                         "properties": {
                           "id": {
                             "type": "string",
-                            "format": "uuid"
+                            "example": "66cf2c0df4002574697e13bb"
                           },
                           "userId": {
                             "type": "string",
-                            "format": "uuid"
+                            "example": "66cf2c0df4002574697e13b6"
                           },
                           "firstName": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "John"
                           },
                           "lastName": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "Doe"
                           },
                           "courses": {
                             "type": "array",
@@ -998,16 +1071,18 @@
                               "properties": {
                                 "id": {
                                   "type": "string",
-                                  "format": "uuid"
+                                  "example": "66cf2c0df4002574697e13bd"
                                 },
                                 "title": {
-                                  "type": "string"
+                                  "type": "string",
+                                  "example": "Biology"
                                 }
                               }
                             }
                           },
                           "officeLocation": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "Room 105"
                           }
                         }
                       }
@@ -1031,14 +1106,16 @@
     },
     "/student": {
       "post": {
-        "tags": [
-          "student"
-        ],
+        "tags": ["student"],
         "summary": "Create a new student",
         "description": "Create a new student record. Only accessible by admins.",
         "operationId": "createStudent",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "requestBody": {
-          "description": "Details for creating a new student",
           "content": {
             "application/json": {
               "schema": {
@@ -1046,19 +1123,21 @@
                 "properties": {
                   "userId": {
                     "type": "string",
-                    "format": "uuid"
+                    "example": "66cf2c0df4002574697e13b1"
                   },
                   "firstName": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "New"
                   },
                   "lastName": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Student"
                   },
                   "courses": {
                     "type": "array",
                     "items": {
                       "type": "string",
-                      "format": "uuid"
+                      "example": "66cf2c0df4002574697e13b3"
                     }
                   }
                 },
@@ -1088,20 +1167,23 @@
                       "properties": {
                         "id": {
                           "type": "string",
-                          "format": "uuid"
+                          "example": "66cf2c0df40025746943iu73"
                         },
                         "userId": {
                           "type": "string",
-                          "format": "uuid"
+                          "example": "66cf2c0df4002574697e13b1"
                         },
                         "firstName": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "New"
                         },
                         "lastName": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "Student"
                         },
                         "enrollmentNumber": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "ENR20240828511394"
                         },
                         "courses": {
                           "type": "array",
@@ -1110,10 +1192,11 @@
                             "properties": {
                               "id": {
                                 "type": "string",
-                                "format": "uuid"
+                                "example": "66cf2c0df4002574697e13b3"
                               },
                               "title": {
-                                "type": "string"
+                                "type": "string",
+                                "example": "Chemistry"
                               }
                             }
                           }
@@ -1139,26 +1222,29 @@
     },
     "/student/{enrollmentNumber}": {
       "get": {
-        "tags": [
-          "student"
-        ],
+        "tags": ["student"],
         "summary": "Get student details",
         "description": "Retrieve details of a student by their enrollment number. Accessible by any authenticated user.",
         "operationId": "getStudent",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "enrollmentNumber",
             "in": "path",
-            "description": "Enrollment number of the student to retrieve",
+            "description": "\n\n**The enrollment number used in this endpoint is an example.** To use this endpoint correctly, you must provide one that is present in the database.",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "example": "ENR20240828511394"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Successful retrieval of student details",
             "content": {
               "application/json": {
                 "schema": {
@@ -1169,20 +1255,23 @@
                       "properties": {
                         "id": {
                           "type": "string",
-                          "format": "uuid"
+                          "example": "66cf2c0df4002574697e13bf"
                         },
                         "userId": {
                           "type": "string",
-                          "format": "uuid"
+                          "example": "66cf26fc858342d14a49f2be"
                         },
                         "firstName": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "Mike"
                         },
                         "lastName": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "Taylor"
                         },
                         "enrollmentNumber": {
-                          "type": "string"
+                          "type": "string",
+                          "example":  "ENR20240828511394"
                         },
                         "courses": {
                           "type": "array",
@@ -1191,10 +1280,11 @@
                             "properties": {
                               "id": {
                                 "type": "string",
-                                "format": "uuid"
+                                "example": "66cf26fc858342d14a49f2b5"
                               },
                               "title": {
-                                "type": "string"
+                                "type": "string",
+                                "example": "Chemistry"
                               }
                             }
                           }
@@ -1215,42 +1305,47 @@
         }
       },
       "put": {
-        "tags": [
-          "student"
-        ],
+        "tags": ["student"],
         "summary": "Update student details",
         "description": "Update details of a student by their enrollment number. Accessible by admins or the student themselves.",
         "operationId": "updateStudent",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "enrollmentNumber",
             "in": "path",
-            "description": "Enrollment number of the student to update",
+            "description": "\n\n**The enrollment number used in this endpoint is an example.** To use this endpoint correctly, you must provide one that is present in the database.",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "example": "ENR20240828511394"
             }
           }
         ],
         "requestBody": {
-          "description": "Details to update the student",
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
                   "firstName": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Mike"
                   },
                   "lastName": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Taylor"
                   },
                   "courses": {
                     "type": "array",
                     "items": {
-                      "type": "string",
-                      "format": "uuid"
-                    }
+                      "type": "string"
+                    },
+                    "example": ["66cf2c0df4002574697e13b3"]
                   }
                 }
               }
@@ -1274,20 +1369,23 @@
                       "properties": {
                         "id": {
                           "type": "string",
-                          "format": "uuid"
+                          "example": "66cf26fc858342d14a49f2b8"
                         },
                         "userId": {
                           "type": "string",
-                          "format": "uuid"
+                          "example": "66cf26fc858342d14a49f2ba"
                         },
                         "firstName": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "Mike"
                         },
                         "lastName": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "Taylor"
                         },
                         "enrollmentNumber": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "ENR20240828511394"
                         },
                         "courses": {
                           "type": "array",
@@ -1296,10 +1394,11 @@
                             "properties": {
                               "id": {
                                 "type": "string",
-                                "format": "uuid"
+                                "example": "66cf2c0df4002574697e13b3"
                               },
                               "title": {
-                                "type": "string"
+                                "type": "string",
+                                "example": "Chemistry"
                               }
                             }
                           }
@@ -1326,20 +1425,24 @@
         }
       },
       "delete": {
-        "tags": [
-          "student"
-        ],
+        "tags": ["student"],
         "summary": "Delete a student",
         "description": "Delete a student record by enrollment number. Only accessible by admins.",
         "operationId": "deleteStudent",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "enrollmentNumber",
             "in": "path",
-            "description": "Enrollment number of the student to delete",
+           "description": "\n\n**The enrollment number used in this endpoint is an example.** To use this endpoint correctly, you must provide one that is present in the database.",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "example": "ENR20240828932503"
             }
           }
         ],
@@ -1352,7 +1455,8 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Student deleted successfully"
                     }
                   }
                 }
@@ -1373,9 +1477,7 @@
     },
     "/student/list": {
       "get": {
-        "tags": [
-          "student"
-        ],
+        "tags": ["student"],
         "summary": "List all students",
         "description": "Retrieve a paginated list of all students. Accessible by any user.",
         "operationId": "listStudents",
@@ -1383,14 +1485,10 @@
           {
             "name": "limit",
             "in": "query",
-            "description": "Number of students to return",
+            "description": "Number of users to return",
             "schema": {
               "type": "integer",
-              "enum": [
-                5,
-                10,
-                30
-              ]
+              "enum": [5, 10, 30]
             }
           },
           {
@@ -1411,16 +1509,20 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Successful retrieval of students list"
                     },
                     "totalStudents": {
-                      "type": "integer"
+                      "type": "integer",
+                      "example": "5"
                     },
                     "totalPages": {
-                      "type": "integer"
+                      "type": "integer",
+                      "example": "1"
                     },
                     "currentPage": {
-                      "type": "integer"
+                      "type": "integer",
+                      "example": "1"
                     },
                     "students": {
                       "type": "array",
@@ -1429,20 +1531,23 @@
                         "properties": {
                           "id": {
                             "type": "string",
-                            "format": "uuid"
+                            "example": "66ce82472f34ff599a6acb26"
                           },
                           "userId": {
                             "type": "string",
-                            "format": "uuid"
+                            "example": "66ce83406d631c28dd300feb"
                           },
                           "firstName": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "Mike"
                           },
                           "lastName": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "Taylor"
                           },
                           "enrollmentNumber": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "ENR20240828511394"
                           },
                           "courses": {
                             "type": "array",
@@ -1451,10 +1556,11 @@
                               "properties": {
                                 "id": {
                                   "type": "string",
-                                  "format": "uuid"
+                                  "example": "66cf26fc858342d14a49f2b8"
                                 },
                                 "title": {
-                                  "type": "string"
+                                  "type": "string",
+                                  "example": "Mathematics"
                                 }
                               }
                             }
@@ -1478,41 +1584,32 @@
     },
     "/course": {
       "post": {
-        "tags": [
-          "course"
-        ],
+        "tags": ["course"],
         "summary": "Create a new course",
         "description": "Create a new course record. Only accessible by admins.",
         "operationId": "createCourse",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "requestBody": {
-          "description": "Details for creating a new course",
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
                   "title": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Back-End"
                   },
                   "department": {
-                    "type": "string"
-                  },
-                  "professors": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "format": "uuid"
-                    }
-                  },
-                  "students": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "format": "uuid"
-                    }
+                    "type": "string",
+                    "example": "Engineering"
                   },
                   "capacity": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": "25"
                   }
                 },
                 "required": [
@@ -1534,53 +1631,27 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Course created successfully"
                     },
                     "course": {
                       "type": "object",
                       "properties": {
                         "id": {
                           "type": "string",
-                          "format": "uuid"
+                          "example": "66cf26fc858342d14a49f2be"
                         },
                         "title": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "Back-End"
                         },
                         "department": {
-                          "type": "string"
-                        },
-                        "professors": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "string",
-                                "format": "uuid"
-                              },
-                              "name": {
-                                "type": "string"
-                              }
-                            }
-                          }
-                        },
-                        "students": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "string",
-                                "format": "uuid"
-                              },
-                              "name": {
-                                "type": "string"
-                              }
-                            }
-                          }
+                          "type": "string",
+                          "example": "Engineering"
                         },
                         "capacity": {
-                          "type": "integer"
+                          "type": "integer",
+                          "example": "25"
                         }
                       }
                     }
@@ -1603,9 +1674,7 @@
     },
     "/course/{id}": {
       "get": {
-        "tags": [
-          "course"
-        ],
+        "tags": ["course"],
         "summary": "Get course details",
         "description": "Retrieve details of a course by its ID. Accessible by any user.",
         "operationId": "getCourse",
@@ -1613,17 +1682,16 @@
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the course to retrieve",
+            "description": "\n\n**The ID used in this endpoint is an example.** To use this endpoint correctly, you must provide one that is present in the database. In this case it is the **entity ID**, Course.",
             "required": true,
             "schema": {
               "type": "string",
-              "format": "uuid"
+              "example": "66cf2c0df4002574697e13b4"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Successful retrieval of course details",
             "content": {
               "application/json": {
                 "schema": {
@@ -1634,13 +1702,15 @@
                       "properties": {
                         "id": {
                           "type": "string",
-                          "format": "uuid"
+                          "example": "66cf2c0df4002574697e13b4"
                         },
                         "title": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "Back-End"
                         },
                         "department": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "Engineering"
                         },
                         "professors": {
                           "type": "array",
@@ -1649,10 +1719,11 @@
                             "properties": {
                               "id": {
                                 "type": "string",
-                                "format": "uuid"
+                                "example": "66cf26fc858342d14a49f2be"
                               },
                               "name": {
-                                "type": "string"
+                                "type": "string",
+                                "example": "John Doe"
                               }
                             }
                           }
@@ -1664,16 +1735,18 @@
                             "properties": {
                               "id": {
                                 "type": "string",
-                                "format": "uuid"
+                                "example": "66cf2c0df40025746943iu73"
                               },
                               "name": {
-                                "type": "string"
+                                "type": "string",
+                                "example": "Mike Taylor"
                               }
                             }
                           }
                         },
                         "capacity": {
-                          "type": "integer"
+                          "type": "integer",
+                          "example": "25"
                         }
                       }
                     }
@@ -1691,53 +1764,44 @@
         }
       },
       "put": {
-        "tags": [
-          "course"
-        ],
+        "tags": ["course"],
         "summary": "Update course details",
         "description": "Update details of a course by its ID. Only accessible by admins.",
         "operationId": "updateCourse",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the course to update",
+            "description": "\n\n**The ID used in this endpoint is an example.** To use this endpoint correctly, you must provide one that is present in the database. In this case it is the **entity ID**, Course.",
             "required": true,
             "schema": {
               "type": "string",
-              "format": "uuid"
+              "example": "66cf2c0df4002574697e13b4"
             }
           }
         ],
         "requestBody": {
-          "description": "Details to update the course",
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
                   "title": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Physics"
                   },
                   "department": {
-                    "type": "string"
-                  },
-                  "professors": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "format": "uuid"
-                    }
-                  },
-                  "students": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "format": "uuid"
-                    }
+                    "type": "string",
+                    "example": "Science"
                   },
                   "capacity": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": "30"
                   }
                 }
               }
@@ -1754,53 +1818,27 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Course updated successfully"
                     },
                     "course": {
                       "type": "object",
                       "properties": {
                         "id": {
                           "type": "string",
-                          "format": "uuid"
+                          "example": "66cf2c0df4002574697e13b4"
                         },
                         "title": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "Physics"
                         },
                         "department": {
-                          "type": "string"
-                        },
-                        "professors": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "string",
-                                "format": "uuid"
-                              },
-                              "name": {
-                                "type": "string"
-                              }
-                            }
-                          }
-                        },
-                        "students": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "string",
-                                "format": "uuid"
-                              },
-                              "name": {
-                                "type": "string"
-                              }
-                            }
-                          }
+                          "type": "string",
+                          "example": "Science"
                         },
                         "capacity": {
-                          "type": "integer"
+                          "type": "integer",
+                          "example": "30"
                         }
                       }
                     }
@@ -1824,21 +1862,24 @@
         }
       },
       "delete": {
-        "tags": [
-          "course"
-        ],
+        "tags": ["course"],
         "summary": "Delete a course",
         "description": "Delete a course record by ID. Only accessible by admins.",
         "operationId": "deleteCourse",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the course to delete",
+            "description": "\n\n**The ID used in this endpoint is an example.** To use this endpoint correctly, you must provide one that is present in the database. In this case it is the **entity ID**, Course.",
             "required": true,
             "schema": {
               "type": "string",
-              "format": "uuid"
+              "example": "66cf2c0df4002574697e13b3"
             }
           }
         ],
@@ -1851,7 +1892,8 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Course deleted successfully"
                     }
                   }
                 }
@@ -1872,9 +1914,7 @@
     },
     "/course/list": {
       "get": {
-        "tags": [
-          "course"
-        ],
+        "tags": ["course"],
         "summary": "List all courses",
         "description": "Retrieve a paginated list of all courses. Accessible by any user.",
         "operationId": "listCourses",
@@ -1882,14 +1922,10 @@
           {
             "name": "limit",
             "in": "query",
-            "description": "Number of courses to return",
+            "description": "Number of users to return",
             "schema": {
               "type": "integer",
-              "enum": [
-                5,
-                10,
-                30
-              ]
+              "enum": [5, 10, 30]
             }
           },
           {
@@ -1910,16 +1946,20 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Successful retrieval of courses list"
                     },
                     "totalCourses": {
-                      "type": "integer"
+                      "type": "integer",
+                      "example": "5"
                     },
                     "totalPages": {
-                      "type": "integer"
+                      "type": "integer",
+                      "example": "1"
                     },
                     "currentPage": {
-                      "type": "integer"
+                      "type": "integer",
+                      "example": "1"
                     },
                     "courses": {
                       "type": "array",
@@ -1928,16 +1968,19 @@
                         "properties": {
                           "id": {
                             "type": "string",
-                            "format": "uuid"
+                            "example": "66ce83406d631c28dd300feb"
                           },
                           "title": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "Physics"
                           },
                           "department": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "Science"
                           },
                           "capacity": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": "25"
                           },
                           "students": {
                             "type": "array",
@@ -1946,10 +1989,11 @@
                               "properties": {
                                 "id": {
                                   "type": "string",
-                                  "format": "uuid"
+                                  "example": "66cf26fc858342d14a49f2b8"
                                 },
                                 "name": {
-                                  "type": "string"
+                                  "type": "string",
+                                  "exemple": "Mike Taylor"
                                 }
                               }
                             }
@@ -1961,10 +2005,11 @@
                               "properties": {
                                 "id": {
                                   "type": "string",
-                                  "format": "uuid"
+                                  "example": "66cf26fc858342d14a49f2be"
                                 },
                                 "name": {
-                                  "type": "string"
+                                  "type": "string",
+                                  "example": "John Doe"
                                 }
                               }
                             }
@@ -1988,9 +2033,7 @@
     },
     "/course/summary/info-course": {
       "get": {
-        "tags": [
-          "course"
-        ],
+        "tags": ["course"],
         "summary": "Get course summary",
         "description": "Retrieve a summary of students distribution and average course capacity.",
         "operationId": "getCourseSummary",
@@ -2003,7 +2046,8 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Successful retrieval of course summary"
                     },
                     "data": {
                       "type": "object",
@@ -2015,16 +2059,19 @@
                             "properties": {
                               "id": {
                                 "type": "string",
-                                "format": "uuid"
+                                "example": "66cf26fc858342d14a49f2b5"
                               },
                               "title": {
-                                "type": "string"
+                                "type": "string",
+                                "example": "Back-End"
                               },
                               "department": {
-                                "type": "string"
+                                "type": "string",
+                                "example": "Engineering"
                               },
                               "totalStudents": {
-                                "type": "integer"
+                                "type": "integer",
+                                "example": "25"
                               }
                             }
                           }
@@ -2035,10 +2082,12 @@
                             "type": "object",
                             "properties": {
                               "department": {
-                                "type": "string"
+                                "type": "string",
+                                "example": "Engineering"
                               },
                               "totalStudents": {
-                                "type": "integer"
+                                "type": "integer",
+                                "example": "5"
                               }
                             }
                           }
