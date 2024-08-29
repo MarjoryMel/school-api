@@ -1,6 +1,6 @@
 <div align="center">
   <h1>:star2: SCHOOL API :star2:</h1>
-  <img src="Imagens/school-img.png" alt="School Logo">
+  <img src="imgs/school-img.png" alt="School Logo">
 </div>
 
 A RESTful API para gerenciamento de usuários, estudantes, professores e cursos. Esta API permite realizar operações CRUD para cada entidade e inclui funcionalidades adicionais para instalação e busca no banco de dados. Documentada com Swagger!
