@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "School API",
-    "description": "API for managing school operations, including user management, professors, students, and courses.\n\n**Note**: The IDs shown in this documentation are fictitious examples. Each time the database is installed, new IDs are generated. To use the API correctly, you must use valid IDs, which can be obtained by listing the entities or directly from the database.",
+    "description": "API for managing school operations, including user management, professors, students, and courses.\n\n**Note**: The IDs shown in this documentation are fictitious examples. Each time the database is installed, new IDs are generated. To use the API correctly, you must use valid IDs, which can be obtained by listing the entities or directly from the database.\n\n**GitHub**: [https://github.com/MarjoryMel/school-api](https://github.com/MarjoryMel/school-api) \n\n**Linkedin**: [https://www.linkedin.com/in/marjorymell/](https://www.linkedin.com/in/marjorymell/)",
     "version": "1.0.0"
   },
   "servers": [
@@ -67,7 +67,7 @@
             }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal error occurred"
           }
         }
       }
@@ -144,10 +144,10 @@
             }
           },
           "400": {
-            "description": "Invalid input"
+            "description": "User with this email or username already exists"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal error occurred"
           }
         }
       }
@@ -255,10 +255,10 @@
             }
           },
           "401": {
-            "description": "Invalid credentials"
+            "description": "Invalid username or password"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal error occurred"
           }
         }
       }
@@ -343,13 +343,13 @@
             }
           },
           "400": {
-            "description": "Invalid input"
+            "description": "User with this email or username already exists"
           },
           "403": {
-            "description": "Access denied"
+            "description": "Access denied. Admins only"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal error occurred"
           }
         }
       }
@@ -395,13 +395,16 @@
             }
           },
           "403": {
-            "description": "Access denied"
+            "description": "Access denied. Admins only"
           },
           "404": {
             "description": "User not found"
           },
+          "409": {
+            "description": "Admin users cannot be deleted by other admins"
+          },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal error occurred"
           }
         }
       },
@@ -495,16 +498,16 @@
             }
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Validation error occurred"
           },
           "403": {
-            "description": "Access denied"
+            "description": "Access denied. Admins only"
           },
           "404": {
             "description": "User not found"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal error occurred"
           }
         }
       }
@@ -571,13 +574,19 @@
             }
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid limit or page parameter"
           },
           "403": {
-            "description": "Access denied"
+            "description": "Access denied. Admins only"
+          },
+          "404": {
+            "description": "No records found for the requested page. Ensure that the page number is within the valid range"
+          },
+          "409": {
+            "description": "There is no user registered in the system"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal server error"
           }
         }
       }
@@ -692,13 +701,19 @@
             }
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Validation error occurred"
           },
           "403": {
-            "description": "Access denied"
+            "description": "Access denied. Admins only"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "409": {
+            "description": "User is already a professor"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal error occurred"
           }
         }
       }
@@ -783,7 +798,7 @@
             "description": "Professor not found"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal error occurred"
           }
         }
       },
@@ -898,16 +913,16 @@
             }
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Validation error occurred"
           },
           "403": {
-            "description": "Access denied"
+            "description": "Access denied. Admins only"
           },
           "404": {
             "description": "Professor not found"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal error occurred"
           }
         }
       },
@@ -983,13 +998,13 @@
             }
           },
           "403": {
-            "description": "Access denied"
+            "description": "Access denied. Admins only"
           },
           "404": {
             "description": "Professor not found"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal error occurred"
           }
         }
       }
@@ -1093,13 +1108,16 @@
             }
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid limit or page parameter"
           },
           "404": {
-            "description": "Page not found"
+            "description": "No records found for the requested page. Ensure that the page number is within the valid range"
+          },
+          "409": {
+            "description": "User is already a professor"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal error occurred"
           }
         }
       }
@@ -1209,13 +1227,13 @@
             }
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Validation error occurred"
           },
           "403": {
-            "description": "Access denied"
+            "description": "Access denied. Admins only"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal error occurred"
           }
         }
       }
@@ -1300,7 +1318,7 @@
             "description": "Student not found"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal error occurred"
           }
         }
       },
@@ -1411,16 +1429,16 @@
             }
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Validation error occurred"
           },
           "403": {
-            "description": "Access denied"
+            "description": "Access denied. Admins only"
           },
           "404": {
             "description": "Student not found"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal error occurred"
           }
         }
       },
@@ -1464,13 +1482,13 @@
             }
           },
           "403": {
-            "description": "Access denied"
+            "description": "Access denied. Admins only"
           },
           "404": {
             "description": "Student not found"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal error occurred"
           }
         }
       }
@@ -1574,10 +1592,16 @@
             }
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid limit or page parameter"
+          },
+          "404": {
+            "description": "No records found for the requested page. Ensure that the page number is within the valid range"
+          },
+          "409": {
+            "description": "There is no student registered in the system"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal error occurred"
           }
         }
       }
@@ -1661,13 +1685,13 @@
             }
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Validation error occurred"
           },
           "403": {
-            "description": "Access denied"
+            "description": "Access denied. Admins only"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal error occurred"
           }
         }
       }
@@ -1759,7 +1783,7 @@
             "description": "Course not found"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal error occurred"
           }
         }
       },
@@ -1848,16 +1872,16 @@
             }
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Validation error occurred"
           },
           "403": {
-            "description": "Access denied"
+            "description": "Access denied. Admins only"
           },
           "404": {
             "description": "Course not found"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal error occurred"
           }
         }
       },
@@ -1901,13 +1925,13 @@
             }
           },
           "403": {
-            "description": "Access denied"
+            "description": "Access denied. Admins only"
           },
           "404": {
             "description": "Course not found"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal error occurred"
           }
         }
       }
@@ -2023,10 +2047,16 @@
             }
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid limit or page parameter"
+          },
+          "404": {
+            "description": "No records found for the requested page. Ensure that the page number is within the valid range"
+          },
+          "409": {
+            "description": "Invalid limit or page parameter"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "There is no course registered in the system"
           }
         }
       }
@@ -2104,7 +2134,7 @@
             }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "An internal error occurred"
           }
         }
       }

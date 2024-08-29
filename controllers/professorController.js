@@ -15,7 +15,7 @@ exports.createProfessor = async (req, res) => {
 
     const { error } = professorCreationValidator.validate({ userId, firstName, lastName, courses, officeLocation });
     if (error) {
-        return res.status(400).json({ message: error.details[0].message });
+        return res.status(400).json({ message: error.details[0].message  });
     }
 
     try {
@@ -26,7 +26,7 @@ exports.createProfessor = async (req, res) => {
         }
         const existingProfessor = await Professor.findOne({ userId });
         if (existingProfessor) {
-            return res.status(400).json({ message: generateErrorMessages('PROFESSOR_ALREADY_EXISTS') });
+            return res.status(409).json({ message: generateErrorMessages('PROFESSOR_ALREADY_EXISTS') });
         }
 
         // Create a new professor
@@ -152,7 +152,6 @@ exports.deleteProfessor = async (req, res) => {
     const { id } = req.params;
 
     try {
-        // Check if the authenticated user is an admin
         if (!req.user.isAdmin) {
             return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
         }
@@ -211,7 +210,7 @@ exports.listProfessors = async (req, res) => {
         }
 
         if (professors.length === 0) {
-            return res.status(404).json({ error: generateErrorMessages('PROFESSOR_NOT_REGISTRATION') });
+            return res.status(409).json({ error: generateErrorMessages('PROFESSOR_NOT_REGISTRATION') });
         }
 
         // Respond with the list of professors

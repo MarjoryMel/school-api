@@ -138,7 +138,7 @@ exports.deleteUser = async (req, res) => {
             return res.status(404).json({ message: generateErrorMessages('USER_NOT_FOUND') });
         }
         if (userToDelete.isAdmin) {
-            return res.status(403).json({ message: generateErrorMessages('CANNOT_DELETE_ADMIN') });
+            return res.status(409).json({ message: generateErrorMessages('CANNOT_DELETE_ADMIN') });
         }
 
         await User.findByIdAndDelete(id);
@@ -157,7 +157,7 @@ exports.updateUser = async (req, res) => {
     // Validate request body
     const { error } = updateUserValidator.validate(req.body);
     if (error) {
-        return res.status(400).json({ message: error.details[0].message });
+        return res.status(400).json({ message: error.details[0].message  });
     }
 
     try {
@@ -227,7 +227,7 @@ exports.listUsers = async (req, res) => {
         }
 
         if (users.length === 0) {
-            return res.status(404).json({ error: generateErrorMessages('USER_NOT_REGISTRATION') });
+            return res.status(409).json({ error: generateErrorMessages('USER_NOT_REGISTRATION') });
         }
 
         // Return the list of users

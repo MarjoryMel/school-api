@@ -11,7 +11,7 @@ exports.createCourse = async (req, res) => {
     // Validate the course data
     const { error } = courseCreationValidator.validate({ title, department, professors, students, capacity });
     if (error) {
-        return res.status(400).json({ message: generateErrorMessages('VALIDATION_ERROR') });
+        return res.status(400).json({ message: error.details[0].message });
     }
 
     try {
@@ -174,7 +174,7 @@ exports.listCourses = async (req, res) => {
         }
 
         if (courses.length === 0) {
-            return res.status(404).json({ error: generateErrorMessages('COURSE_NOT_REGISTRATION') });
+            return res.status(409).json({ error: generateErrorMessages('COURSE_NOT_REGISTRATION') });
         }
 
         // Return the list of courses with populated professor and student names

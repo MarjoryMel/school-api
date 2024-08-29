@@ -14,7 +14,7 @@ exports.createStudent = async (req, res) => {
 
     const { error } = studentCreationValidator.validate({ userId, firstName, lastName, courses });
     if (error) {
-        return res.status(400).json({ message: generateErrorMessages('VALIDATION_ERROR') });
+        return res.status(400).json({ message: error.details[0].message });
     }
 
     try {
@@ -201,7 +201,7 @@ exports.listStudents = async (req, res) => {
             });
 
         if (students.length === 0) {
-            return res.status(404).json({ message: generateErrorMessages('STUDENT_NOT_REGISTRATION') });
+            return res.status(409).json({ message: generateErrorMessages('STUDENT_NOT_REGISTRATION') });
         }
 
         // Return the list of students with pagination info

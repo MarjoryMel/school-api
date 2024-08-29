@@ -27,7 +27,7 @@ const generateErrorMessages = (type, details = {}) => {
         'PROFESSOR_NOT_FOUND': 'Professor not found.',
         'PROFESSOR_NOT_REGISTRATION': 'There is no professor registered in the system',
         'VALIDATION_ERROR': 'Validation error occurred.',
-        'INTERNAL_ERROR': 'An internal error occurred.',
+        'INTERNAL_ERROR': 'An internal error occurred.', 
         'COURSE_ALREADY_EXISTS': 'A course with this title already exists.',
         'STUDENT_NOT_FOUND': 'Student not found.',
         'STUDENT_NOT_REGISTRATION': 'There is no student registered in the system',
