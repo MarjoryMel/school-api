@@ -58,7 +58,6 @@ exports.getCourse = async (req, res) => {
 
         const students = course.students.map(student => ({ id: student._id, firstName: student.firstName,  lastName: student.lastName }));
 
-        // Return the course details with IDs and names for professors and students
         return res.status(200).json({ course: { id: course._id,  title: course.title,  department: course.department, professors: professors,  students: students }  });
     } catch (error) {
         console.error('Error retrieving course:', error.message);
@@ -96,7 +95,6 @@ exports.updateCourse = async (req, res) => {
         });
         await course.save();
 
-        // Return the updated course details
         return res.status(200).json({
             message: 'Course updated successfully',
             course: { id: course._id, title: course.title, department: course.department, professors: course.professors, students: course.students, capacity: course.capacity }
@@ -174,12 +172,10 @@ exports.listCourses = async (req, res) => {
         const totalCourses = await Course.countDocuments();
         const totalPages = Math.ceil(totalCourses / limit);
         
-        // Check if the requested page is valid
         if (page > totalPages) {
             return res.status(404).json({ error: generateErrorMessages('PAGE_NOT_FOUND') });
         }
 
-        // Check if any courses are found
         if (courses.length === 0) {
             return res.status(404).json({ error: generateErrorMessages('COURSE_NOT_REGISTRATION') });
         }
@@ -272,7 +268,6 @@ exports.getCourseSummary = async (req, res) => {
             }
         };
 
-        // Send the response
         res.status(200).json(response);
     } catch (error) {
         console.error('Error retrieving course summary:', error.message);

@@ -6,14 +6,12 @@ const { generateErrorMessages } = require('../utils/errorMessages');
 
 // Function to create a new student (only admins can)
 exports.createStudent = async (req, res) => {
-    // Check if the authenticated user is an admin
     if (!req.user.isAdmin) {
         return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
     }
 
     const { userId, firstName, lastName, courses } = req.body;
 
-    // Validate the request body
     const { error } = studentCreationValidator.validate({ userId, firstName, lastName, courses });
     if (error) {
         return res.status(400).json({ message: generateErrorMessages('VALIDATION_ERROR') });
@@ -55,7 +53,6 @@ exports.getStudent = async (req, res) => {
     const { enrollmentNumber } = req.params;
 
     try {
-        // Find student by enrollment number and populate the courses field with course details
         const student = await Student.findOne({ enrollmentNumber }).populate('courses');
         if (!student) {
             return res.status(404).json({ message: generateErrorMessages('STUDENT_NOT_FOUND') });
@@ -88,7 +85,6 @@ exports.updateStudent = async (req, res) => {
             return res.status(404).json({ message: generateErrorMessages('STUDENT_NOT_FOUND') });
         }
 
-        // Validate the request body
         const { error } = studentUpdateValidator.validate(updates);
         if (error) {
             return res.status(400).json({ message: error.details[0].message });
@@ -115,10 +111,7 @@ exports.updateStudent = async (req, res) => {
 
             // If the courses array is being updated
             if (updates.courses && Array.isArray(updates.courses)) {
-                // Set the new list of courses
                 student.courses = updates.courses;
-
-                // Add the student to the new courses
                 for (const courseId of student.courses) {
                     const course = await Course.findById(courseId);
                     if (course) {
@@ -150,7 +143,6 @@ exports.deleteStudent = async (req, res) => {
     const { enrollmentNumber } = req.params;
 
     try {
-        // Check if the authenticated user is an admin
         if (!req.user.isAdmin) {
             return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
         }
@@ -192,11 +184,9 @@ exports.listStudents = async (req, res) => {
         // Calculate the number of items to skip
         const skip = (page - 1) * limit;
 
-        // Get total count for pagination information
         const totalStudents = await Student.countDocuments();
         const totalPages = Math.ceil(totalStudents / limit);
 
-        // Check if the requested page is valid
         if (page > totalPages) {
             return res.status(404).json({ error: generateErrorMessages('PAGE_NOT_FOUND') });
         }
@@ -210,7 +200,6 @@ exports.listStudents = async (req, res) => {
                 select: 'title'
             });
 
-        // Check if any students are found
         if (students.length === 0) {
             return res.status(404).json({ message: generateErrorMessages('STUDENT_NOT_REGISTRATION') });
         }

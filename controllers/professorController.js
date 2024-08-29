@@ -13,7 +13,6 @@ exports.createProfessor = async (req, res) => {
 
     const { userId, firstName, lastName, courses, officeLocation } = req.body;
 
-    // Validate the request body
     const { error } = professorCreationValidator.validate({ userId, firstName, lastName, courses, officeLocation });
     if (error) {
         return res.status(400).json({ message: error.details[0].message });
@@ -122,10 +121,7 @@ exports.updateProfessor = async (req, res) => {
 
             // If the courses array is being updated
             if (updates.courses && Array.isArray(updates.courses)) {
-                // Set the new list of courses
                 professor.courses = updates.courses;
-
-                // Add the professor to the new courses
                 for (const courseId of professor.courses) {
                     const course = await Course.findById(courseId);
                     if (course) {
@@ -210,12 +206,10 @@ exports.listProfessors = async (req, res) => {
         const totalProfessors = await Professor.countDocuments();
         const totalPages = Math.ceil(totalProfessors / limit);
 
-        // Check if the requested page is valid
         if (page > totalPages) {
             return res.status(404).json({ error: generateErrorMessages('PAGE_NOT_FOUND') });
         }
 
-        // Check if any professors are found
         if (professors.length === 0) {
             return res.status(404).json({ error: generateErrorMessages('PROFESSOR_NOT_REGISTRATION') });
         }

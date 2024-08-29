@@ -96,7 +96,6 @@ exports.createAdmin = async (req, res) => {
     }
 
     try {
-        // Check if the authenticated user is an admin
         if (!req.user.isAdmin) {
             return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
         }
@@ -126,11 +125,9 @@ exports.createAdmin = async (req, res) => {
 
 // Delete only users (only admins can)
 exports.deleteUser = async (req, res) => {
-    // User ID to be deleted
     const { id } = req.params;
 
     try {
-        // Checks if the authenticated user is an administrator
         if (!req.user.isAdmin) {
             return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
         }
@@ -144,7 +141,6 @@ exports.deleteUser = async (req, res) => {
             return res.status(403).json({ message: generateErrorMessages('CANNOT_DELETE_ADMIN') });
         }
 
-        // Delete the user
         await User.findByIdAndDelete(id);
         res.status(200).json({ message: 'User deleted successfully' });
     } catch (error) {
@@ -167,7 +163,6 @@ exports.updateUser = async (req, res) => {
     try {
         // Check if the authenticated user is an admin or if the user is updating their own data
         if (!req.user.isAdmin) {
-            // If not an admin, ensure the user is updating their own data
             if (req.user.userId !== id) {
                 return res.status(403).json({ message: generateErrorMessages('USER_CANNOT_UPDATE') });
             }
@@ -176,7 +171,6 @@ exports.updateUser = async (req, res) => {
         // Find and update the user
         const updateData = { username, email, password };
         if (password) {
-            // Hash the password if provided
             const salt = await bcrypt.genSalt(10);
             updateData.password = await bcrypt.hash(password, salt);
         }
@@ -200,7 +194,6 @@ exports.updateUser = async (req, res) => {
 // List all users (accessible by admins only)
 exports.listUsers = async (req, res) => {
     try {
-        // Check if the authenticated user is an admin
         if (!req.user.isAdmin) {
             return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
         }
@@ -226,16 +219,13 @@ exports.listUsers = async (req, res) => {
             .skip(skip)
             .limit(limit);
 
-        // Get total count for pagination information
         const totalUsers = await User.countDocuments();
         const totalPages = Math.ceil(totalUsers / limit);
 
-        // Check if the requested page is valid
         if (page > totalPages) {
             return res.status(404).json({ error: generateErrorMessages('PAGE_NOT_FOUND') });
         }
 
-        // Check if any users are found
         if (users.length === 0) {
             return res.status(404).json({ error: generateErrorMessages('USER_NOT_REGISTRATION') });
         }
