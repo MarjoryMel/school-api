@@ -15,7 +15,6 @@ exports.createCourse = async (req, res) => {
     }
 
     try {
-        // Check if the authenticated user is an admin
         if (!req.user.isAdmin) {
             return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
         }
@@ -72,7 +71,6 @@ exports.updateCourse = async (req, res) => {
     const updates = req.body;
 
     try {
-        // Check if the authenticated user is an admin
         if (!req.user.isAdmin) {
             return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
         }
@@ -110,7 +108,6 @@ exports.deleteCourse = async (req, res) => {
     const { id } = req.params;
 
     try {
-        // Check if the authenticated user is an admin
         if (!req.user.isAdmin) {
             return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
         }
@@ -258,7 +255,6 @@ exports.getCourseSummary = async (req, res) => {
             }
         ]);
 
-        // Construct the response object
         const response = {
             message: 'Course summary retrieved successfully',
             data: {

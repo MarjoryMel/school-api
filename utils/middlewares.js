@@ -9,7 +9,6 @@ const authMiddleware = (req, res, next) => {
         return res.status(401).json({ message: 'Access denied. No token provided.' });
     }
 
-    // Extract the token from the Authorization header
     const token = authHeader.replace('Bearer ', '');
 
     try {
