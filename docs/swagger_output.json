@@ -544,28 +544,49 @@
         ],
         "responses": {
           "200": {
-            "description": "Successful operation",
+            "description": "Professors listed successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "example": "66cf2c0df4002574697e13af"
-                      },
-                      "username": {
-                        "type": "string",
-                        "example": "admin"
-                      },
-                      "email": {
-                        "type": "string",
-                        "example": "admin@example.com"
-                      },
-                      "isAdmin": {
-                        "type": "boolean"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Users listed successfully"
+                    },
+                    "totalUsers": {
+                      "type": "integer",
+                      "example": "5"
+                    },
+                    "totalPages": {
+                      "type": "integer",
+                      "example": "1"
+                    },
+                    "currentPage": {
+                      "type": "integer",
+                      "example": "1"
+                    },
+                    "users": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "66cf2c0df4002574697e13af"
+                          },
+                          "username": {
+                            "type": "string",
+                            "example": "admin"
+                          },
+                          "email": {
+                            "type": "string",
+                            "example": "admin@example.com"
+                          },
+                          "isAdmin": {
+                            "type": "boolean"
+                          }
+                        }
                       }
                     }
                   }
