@@ -21,8 +21,12 @@ Para iniciar o projeto localmente, siga estes passos:
 
 ### Pré-requisitos
 
-- [Node.js](https://nodejs.org/) (v16 ou superior)
-- [MongoDB](https://www.mongodb.com/) (local ou via Atlas)
+Recomendo deixar ativida a opção de instalar o MongoDB Compass (GUI) ao instalar o Community Server!
+
+- [Node.js](https://nodejs.org/) 
+- [MongoDB](https://www.mongodb.com/)
+  - [Mongo Community Server](https://www.mongodb.com/try/download/community) 
+  - [Mongo Shell](https://www.mongodb.com/try/download/shell)
 
 ### Instalação
 
