@@ -1,5 +1,6 @@
 const Course = require('../models/courseModel');
 const Student = require('../models/studentModel');
+const Professor = require('../models/professorModel');
 const User = require('../models/userModel');
 const { courseCreationValidator, courseUpdateValidator } = require('../validators/courseValidator');
 const { generateErrorMessages } = require('../utils/errorMessages');
@@ -71,10 +72,6 @@ exports.updateCourse = async (req, res) => {
     const updates = req.body;
 
     try {
-        if (!req.user.isAdmin) {
-            return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
-        }
-
         // Validate the request body
         const { error } = courseUpdateValidator.validate(updates);
         if (error) {
@@ -108,10 +105,6 @@ exports.deleteCourse = async (req, res) => {
     const { id } = req.params;
 
     try {
-        if (!req.user.isAdmin) {
-            return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
-        }
-
         // Find and delete the course by ID
         const course = await Course.findByIdAndDelete(id);
         if (!course) {
@@ -203,17 +196,25 @@ exports.listCourses = async (req, res) => {
     }
 };
 
-// Get a summary of students distribution and average course capacity
+// Get a summary of students and professors distribution and average course capacity
 exports.getCourseSummary = async (req, res) => {
     try {
-        // Retrieve total number of students in each course with capacity
-        const studentsPerCourse = await Course.aggregate([
+        // Retrieve total number of students and professors in each course with capacity
+        const studentsAndProfessorsPerCourse = await Course.aggregate([
             {
                 $lookup: {
                     from: 'students',
                     localField: 'students',
                     foreignField: '_id',
                     as: 'studentsList'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'professors',
+                    localField: 'professors',
+                    foreignField: '_id',
+                    as: 'professorsList'
                 }
             },
             {
@@ -222,13 +223,21 @@ exports.getCourseSummary = async (req, res) => {
                     title: 1,
                     capacity: 1,
                     department: 1,
-                    totalStudents: { $size: '$studentsList' }
+                    totalStudents: { $size: '$studentsList' },
+                    totalProfessors: { $size: '$professorsList' },
+                    professorsNames: { 
+                        $map: {
+                            input: '$professorsList',
+                            as: 'professor',
+                            in: { name: { $concat: ['$$professor.firstName', ' ', '$$professor.lastName'] } }
+                        }
+                    }
                 }
             }
         ]);
 
-        // Retrieve total number of students in each department
-        const studentsPerDepartment = await Course.aggregate([
+        // Retrieve total number of students and professors in each department
+        const studentsAndProfessorsPerDepartment = await Course.aggregate([
             {
                 $lookup: {
                     from: 'students',
@@ -238,9 +247,18 @@ exports.getCourseSummary = async (req, res) => {
                 }
             },
             {
+                $lookup: {
+                    from: 'professors',
+                    localField: 'professors',
+                    foreignField: '_id',
+                    as: 'professorsList'
+                }
+            },
+            {
                 $group: {
                     _id: '$department',
-                    totalStudents: { $sum: { $size: '$studentsList' } }
+                    totalStudents: { $sum: { $size: '$studentsList' } },
+                    totalProfessors: { $sum: { $size: '$professorsList' } }
                 }
             }
         ]);
@@ -258,8 +276,8 @@ exports.getCourseSummary = async (req, res) => {
         const response = {
             message: 'Course summary retrieved successfully',
             data: {
-                studentsPerCourse,
-                studentsPerDepartment,
+                studentsAndProfessorsPerCourse,
+                studentsAndProfessorsPerDepartment,
                 averageCapacity: averageCapacityResult ? averageCapacityResult.averageCapacity : 0
             }
         };
@@ -270,3 +288,4 @@ exports.getCourseSummary = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 };
+

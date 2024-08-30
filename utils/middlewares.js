@@ -21,4 +21,16 @@ const authMiddleware = (req, res, next) => {
     }
 };
 
-module.exports = authMiddleware;
+// Middleware to check if user is an admin
+const checkAdmin = (req, res, next) => {
+    if (!req.user || !req.user.isAdmin) {
+        return res.status(403).json({ message: 'Access denied. Admins only.' });
+    }
+    next();
+};
+
+
+module.exports = { 
+    authMiddleware,
+    checkAdmin
+}

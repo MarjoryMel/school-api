@@ -13,7 +13,7 @@
   },
   "name": "school-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "<div align=\"center\">\r   <h1>:star2: SCHOOL API :star2:</h1>\r   <img src=\"imgs/school-img.png\" alt=\"School Logo\">\r </div>",
   "main": "index.js",
   "scripts": {
     "swagger-autogen": "node swagger.js",
@@ -21,5 +21,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "directories": {
+    "doc": "docs"
+  },
+  "devDependencies": {}
 }

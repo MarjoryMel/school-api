@@ -6,10 +6,6 @@ const { generateErrorMessages } = require('../utils/errorMessages');
 
 // Function to create a new student (only admins can)
 exports.createStudent = async (req, res) => {
-    if (!req.user.isAdmin) {
-        return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
-    }
-
     const { userId, firstName, lastName, courses } = req.body;
 
     const { error } = studentCreationValidator.validate({ userId, firstName, lastName, courses });
@@ -143,10 +139,6 @@ exports.deleteStudent = async (req, res) => {
     const { enrollmentNumber } = req.params;
 
     try {
-        if (!req.user.isAdmin) {
-            return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
-        }
-
         // Find and delete the student by enrollment number
         const student = await Student.findOneAndDelete({ enrollmentNumber });
         if (!student) {

@@ -96,10 +96,6 @@ exports.createAdmin = async (req, res) => {
     }
 
     try {
-        if (!req.user.isAdmin) {
-            return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
-        }
-
         console.log('Creating admin user:', { username, email });
 
         // Check if the user already exists
@@ -128,10 +124,6 @@ exports.deleteUser = async (req, res) => {
     const { id } = req.params;
 
     try {
-        if (!req.user.isAdmin) {
-            return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
-        }
-
         // Checks if the authenticated user is trying to delete another administrator
         const userToDelete = await User.findById(id);
         if (!userToDelete) {

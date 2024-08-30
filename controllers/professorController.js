@@ -6,11 +6,6 @@ const { generateErrorMessages } = require('../utils/errorMessages');
 
 // Create a new professor (only admins can)
 exports.createProfessor = async (req, res) => {
-
-    if (!req.user.isAdmin) {
-        return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
-    }
-
     const { userId, firstName, lastName, courses, officeLocation } = req.body;
 
     const { error } = professorCreationValidator.validate({ userId, firstName, lastName, courses, officeLocation });
@@ -152,10 +147,6 @@ exports.deleteProfessor = async (req, res) => {
     const { id } = req.params;
 
     try {
-        if (!req.user.isAdmin) {
-            return res.status(403).json({ message: generateErrorMessages('ACCESS_DENIED') });
-        }
-
         // Find and delete the professor by ID
         const professor = await Professor.findByIdAndDelete(id);
         if (!professor) {
