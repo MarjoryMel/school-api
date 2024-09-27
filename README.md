@@ -34,7 +34,7 @@ Recomendo deixar ativida a opção de instalar o MongoDB Compass (GUI) ao instal
 2. Faça o clone deste repositório em sua máquina local:
 
    ```bash
-   git clone https://github.com/MarjoryMel/school-api
+   git clone https://github.com/marjorymell/school-api
    
 3. Abra o terminal e execute *npm install* para instalar todas as dependências necessárias:
 4. Após a instalação bem-sucedida, execute *npm start* para iniciar o servidor.
